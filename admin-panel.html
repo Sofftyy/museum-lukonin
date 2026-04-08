@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Админ-панель | Главная</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/admin.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/admin.js"></script>
+</head>
+<body>
+    <div class="admin-header">
+        <div class="logo">
+            <h1>👑 Админ-панель</h1>
+            <span>Мемориальная квартира М.К. Луконина</span>
+        </div>
+        <div class="admin-info">
+            <span id="adminName">Администратор</span>
+            <a href="admin-panel.html">Главная</a>
+            <a href="admin-bookings.html">📋 Все заявки</a>
+            <a href="javascript:void(0)" onclick="logout()" class="logout-btn">Выход</a>
+        </div>
+    </div>
+    
+    <div class="admin-nav">
+        <a href="admin-panel.html" class="nav-link active">📊 Главная</a>
+        <a href="admin-bookings.html" class="nav-link">📋 Все заявки</a>
+    </div>
+    
+    <div class="admin-content">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number" id="totalBookings">-</div>
+                <div class="stat-label">Всего заявок</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="pendingBookings">-</div>
+                <div class="stat-label">Новых заявок</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="confirmedBookings">-</div>
+                <div class="stat-label">Подтверждено</div>
+            </div>
+        </div>
+        
+        <h2 class="section-title">📋 Последние заявки</h2>
+        <div class="table-container">
+            <div id="recentBookingsTable" class="loading">Загрузка...</div>
+        </div>
+    </div>
+</body>
+</html>
