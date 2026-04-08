@@ -1,0 +1,640 @@
+// ========== КОНФИГУРАЦИЯ ==========
+const CONFIG = {
+    ADMIN_EMAIL: 'midex1337@mail.ru',
+    SITE_URL: 'https://vokm134.ru'
+};
+
+// ========== ОБЩИЕ ФУНКЦИИ ==========
+function toggleGrayscale() {
+    const html = document.documentElement;
+    if (html.style.filter === 'grayscale(100%)') {
+        html.style.filter = 'none';
+    } else {
+        html.style.filter = 'grayscale(100%)';
+    }
+}
+
+function initLogoLink() {
+    const logoLink = document.getElementById('logoLink');
+    if (logoLink) {
+        logoLink.addEventListener('click', function() {
+            window.location.href = 'index.html';
+        });
+    }
+}
+
+// ========== ДАННЫЕ ЭКСКУРСИЙ ==========
+let excursionsData = {
+    "2026-04-02": [{ id: 1, name: "Посиделки у поэта", time: "15:00", duration: "1 час", price: 250, places: 15, description: "Участники мероприятия придут в гости в «сталинку» поэта на набережную реки Волга. Познакомятся с историей квартиры, увидят уникальные экспонаты из разных стран, услышат занимательные истории из жизни Михаила Луконина." }],
+    "2026-04-09": [{ id: 2, name: "Советский экран", time: "15:00", duration: "1.5 часа", price: 250, places: 12, description: "Мероприятие в мемориальной квартире поэта, посвященное советскому кинематографу и его связи с творчеством Луконина." }],
+    "2026-04-16": [{ id: 3, name: "Советский экран", time: "15:00", duration: "1.5 часа", price: 250, places: 12, description: "Мероприятие в мемориальной квартире поэта, посвященное советскому кинематографу и его связи с творчеством Луконина." }],
+    "2026-04-23": [{ id: 4, name: "Большая жизнь маленькой квартиры", time: "18:00", duration: "2 часа", price: 500, places: 20, description: "Совместный проект с благотворительным фондом «Маленькие люди». Творческие встречи, лекции, моноспектакли с участием актеров волгоградских театров." }],
+    "2026-05-01": [{ id: 5, name: "Посиделки у поэта", time: "15:00", duration: "1 час", price: 250, places: 8, description: "Участники мероприятия придут в гости в «сталинку» поэта на набережную реки Волга." }],
+    "2026-05-15": [{ id: 6, name: "Советский экран", time: "15:00", duration: "1.5 часа", price: 250, places: 10, description: "Мероприятие в мемориальной квартире поэта." }]
+};
+
+let currentDate1 = new Date();
+let currentDate2 = new Date();
+let currentView = 'calendar';
+
+// ========== РАБОТА С LOCALSTORAGE ==========
+function loadSavedData() {
+    const savedExcursions = localStorage.getItem('excursionsData');
+    if (savedExcursions) {
+        excursionsData = JSON.parse(savedExcursions);
+    }
+    
+    const bookings = JSON.parse(localStorage.getItem('bookings') || '[]');
+    if (bookings.length > 0) {
+        console.log(`📋 Всего заявок в базе: ${bookings.length}`);
+    }
+}
+
+function saveExcursionsToLocal() {
+    localStorage.setItem('excursionsData', JSON.stringify(excursionsData));
+}
+
+// ========== РАБОТА С ЗАЯВКАМИ ==========
+function saveBooking(bookingData) {
+    const { dateStr, excursionId, excursionName, time, price, name, phone, email, persons, comment } = bookingData;
+    
+    const excursions = excursionsData[dateStr];
+    if (excursions) {
+        const excursion = excursions.find(e => e.id === excursionId);
+        if (excursion && excursion.places >= persons) {
+            excursion.places -= parseInt(persons);
+        }
+    }
+    
+    const newBooking = {
+        id: Date.now(),
+        date: dateStr,
+        dateFormatted: formatDateForDisplay(dateStr),
+        excursionId,
+        excursionName,
+        time,
+        price,
+        persons: parseInt(persons),
+        totalPrice: price * parseInt(persons),
+        name,
+        phone,
+        email,
+        comment,
+        status: 'pending',
+        createdAt: new Date().toISOString(),
+        adminEmail: CONFIG.ADMIN_EMAIL
+    };
+    
+    const bookings = JSON.parse(localStorage.getItem('bookings') || '[]');
+    bookings.push(newBooking);
+    localStorage.setItem('bookings', JSON.stringify(bookings));
+    localStorage.setItem('excursionsData', JSON.stringify(excursionsData));
+    
+    sendNotification(newBooking);
+    return newBooking;
+}
+
+function sendNotification(booking) {
+    console.log('📧 ===== НОВАЯ ЗАЯВКА =====');
+    console.log(`📧 Отправка уведомления на: ${CONFIG.ADMIN_EMAIL}`);
+    console.log(`📅 Экскурсия: ${booking.excursionName}`);
+    console.log(`📆 Дата: ${booking.dateFormatted} в ${booking.time}`);
+    console.log(`👤 Посетитель: ${booking.name}, ${booking.phone}, ${booking.email}`);
+    console.log(`👥 Количество: ${booking.persons} чел., Сумма: ${booking.totalPrice} руб.`);
+    console.log('============================\n');
+    
+    const sentBookings = JSON.parse(localStorage.getItem('sentBookings') || '[]');
+    sentBookings.push({ ...booking, sentAt: new Date().toISOString() });
+    localStorage.setItem('sentBookings', JSON.stringify(sentBookings));
+}
+
+function checkAvailability(dateStr, excursionId, persons) {
+    const excursions = excursionsData[dateStr];
+    if (!excursions) return false;
+    const excursion = excursions.find(e => e.id === excursionId);
+    if (!excursion) return false;
+    return excursion.places >= persons;
+}
+
+function getAvailablePlaces(dateStr, excursionId) {
+    const excursions = excursionsData[dateStr];
+    if (!excursions) return 0;
+    const excursion = excursions.find(e => e.id === excursionId);
+    return excursion ? excursion.places : 0;
+}
+
+function formatDateForDisplay(dateStr) {
+    const [year, month, day] = dateStr.split('-');
+    return `${day}.${month}.${year}`;
+}
+
+// ========== ФУНКЦИИ ДЛЯ АДМИНИСТРАТОРА ==========
+function showStats() {
+    const bookings = JSON.parse(localStorage.getItem('bookings') || '[]');
+    console.log('\n📊 ===== СТАТИСТИКА МУЗЕЯ =====');
+    console.log(`📝 Всего заявок: ${bookings.length}`);
+    let totalPlaces = 0;
+    for (const date in excursionsData) {
+        excursionsData[date].forEach(exc => { totalPlaces += exc.places; });
+    }
+    console.log(`🎟️ Всего свободных мест: ${totalPlaces}`);
+    console.log('================================\n');
+}
+
+function exportBookings() {
+    const bookings = JSON.parse(localStorage.getItem('bookings') || '[]');
+    const dataStr = JSON.stringify(bookings, null, 2);
+    const blob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `museum_bookings_${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    console.log('📥 Экспорт заявок выполнен');
+}
+
+window.showStats = showStats;
+window.exportBookings = exportBookings;
+
+// ========== КАЛЕНДАРЬ ==========
+function initDates() {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    currentDate1 = new Date(today);
+    currentDate2 = new Date(today);
+    currentDate2.setMonth(currentDate2.getMonth() + 1);
+}
+
+function formatDate(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
+function getMonthName(date) {
+    const months = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
+    return `${months[date.getMonth()]} ${date.getFullYear()}`;
+}
+
+function hasExcursions(dateStr) {
+    return excursionsData[dateStr] !== undefined;
+}
+
+function isPastDate(date) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return date < today;
+}
+
+function renderSingleCalendar(containerId, monthBtnId, monthDisplayId, currentDate) {
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+    
+    const firstDay = new Date(year, month, 1);
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    let startWeekday = firstDay.getDay();
+    let startOffset = startWeekday === 0 ? 6 : startWeekday - 1;
+    
+    document.getElementById(monthDisplayId).textContent = getMonthName(currentDate);
+    
+    const container = document.getElementById(containerId);
+    container.innerHTML = '';
+    
+    for (let i = 0; i < startOffset; i++) {
+        const emptyDiv = document.createElement('div');
+        emptyDiv.className = 'calendar-day other-month';
+        emptyDiv.textContent = '';
+        container.appendChild(emptyDiv);
+    }
+    
+    for (let day = 1; day <= daysInMonth; day++) {
+        const dateObj = new Date(year, month, day);
+        const dateStr = formatDate(dateObj);
+        const isAvail = hasExcursions(dateStr);
+        const isPast = isPastDate(dateObj);
+        
+        const dayDiv = document.createElement('div');
+        dayDiv.className = 'calendar-day';
+        dayDiv.textContent = day;
+        
+        if (isPast) {
+            dayDiv.classList.add('past');
+        } else if (isAvail) {
+            dayDiv.classList.add('available');
+            dayDiv.addEventListener('click', () => openModal(dateStr));
+        }
+        
+        container.appendChild(dayDiv);
+    }
+    
+    const prevBtn = document.getElementById(monthBtnId);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    if (currentDate.getFullYear() === today.getFullYear() && currentDate.getMonth() <= today.getMonth()) {
+        prevBtn.classList.add('disabled');
+        prevBtn.disabled = true;
+    } else {
+        prevBtn.classList.remove('disabled');
+        prevBtn.disabled = false;
+    }
+}
+
+function renderBothCalendars() {
+    if (document.getElementById('calendarDays1')) {
+        renderSingleCalendar('calendarDays1', 'prevMonthBtn1', 'currentMonth1', currentDate1);
+        renderSingleCalendar('calendarDays2', 'prevMonthBtn2', 'currentMonth2', currentDate2);
+    }
+}
+
+function changeMonth(offset, isSecondCalendar) {
+    if (isSecondCalendar) {
+        const newDate = new Date(currentDate2);
+        newDate.setMonth(newDate.getMonth() + offset);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        if (newDate < today) return;
+        if (newDate <= currentDate1) return;
+        currentDate2 = newDate;
+    } else {
+        const newDate = new Date(currentDate1);
+        newDate.setMonth(newDate.getMonth() + offset);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        if (newDate < today) return;
+        currentDate1 = newDate;
+        if (currentDate2 <= currentDate1) {
+            currentDate2 = new Date(currentDate1);
+            currentDate2.setMonth(currentDate2.getMonth() + 1);
+        }
+    }
+    renderBothCalendars();
+}
+
+// ========== МОДАЛЬНЫЕ ОКНА ==========
+function openModal(dateStr) {
+    const excursions = excursionsData[dateStr];
+    if (!excursions) return;
+    
+    const modal = document.getElementById('excursionModal');
+    if (!modal) return;
+    
+    const modalDate = document.getElementById('modalDate');
+    const modalList = document.getElementById('modalExcursionsList');
+    
+    const [year, month, day] = dateStr.split('-');
+    modalDate.textContent = `${day}.${month}.${year}`;
+    
+    modalList.innerHTML = '';
+    excursions.forEach(exc => {
+        const excDiv = document.createElement('div');
+        excDiv.className = 'excursion-item';
+        excDiv.innerHTML = `
+            <h4>${exc.name}</h4>
+            <p>🕒 ${exc.time} (${exc.duration})</p>
+            <p>💰 ${exc.price} руб./чел.</p>
+            <p class="excursion-places">📅 Свободно мест: ${exc.places}</p>
+            <p>📝 ${exc.description.substring(0, 100)}${exc.description.length > 100 ? '...' : ''}</p>
+        `;
+        excDiv.addEventListener('click', () => {
+            closeModal();
+            openBookingForm(dateStr, exc);
+        });
+        modalList.appendChild(excDiv);
+    });
+    
+    modal.style.display = 'flex';
+}
+
+function closeModal() {
+    const modal = document.getElementById('excursionModal');
+    if (modal) modal.style.display = 'none';
+}
+
+function openBookingForm(dateStr, excursion) {
+    const bookingModal = document.getElementById('bookingFormModal');
+    if (!bookingModal) return;
+    
+    const [year, month, day] = dateStr.split('-');
+    
+    const form = document.getElementById('bookingForm');
+    form.setAttribute('data-date', `${day}.${month}.${year}`);
+    form.setAttribute('data-date-str', dateStr);
+    form.setAttribute('data-excursion', excursion.name);
+    form.setAttribute('data-time', excursion.time);
+    form.setAttribute('data-price', excursion.price);
+    form.setAttribute('data-id', excursion.id);
+    
+    const availablePlaces = getAvailablePlaces(dateStr, excursion.id);
+    const personsInput = form.querySelector('input[type="number"]');
+    personsInput.max = availablePlaces;
+    
+    let placesHint = form.querySelector('.places-hint');
+    if (placesHint) {
+        placesHint.textContent = `Свободно мест: ${availablePlaces}`;
+    }
+    
+    bookingModal.style.display = 'flex';
+}
+
+function closeBookingForm() {
+    const modal = document.getElementById('bookingFormModal');
+    if (modal) modal.style.display = 'none';
+}
+
+function handleBookingSubmit(event) {
+    event.preventDefault();
+    
+    const form = event.target;
+    const name = form.querySelector('input[type="text"]').value;
+    const phone = form.querySelector('input[type="tel"]').value;
+    const email = form.querySelector('input[type="email"]').value;
+    const persons = parseInt(form.querySelector('input[type="number"]').value);
+    const comment = form.querySelector('textarea').value;
+    const dateFormatted = form.getAttribute('data-date');
+    const excursionName = form.getAttribute('data-excursion');
+    const time = form.getAttribute('data-time');
+    const price = parseInt(form.getAttribute('data-price'));
+    const excursionId = parseInt(form.getAttribute('data-id'));
+    const dateStr = form.getAttribute('data-date-str');
+    
+    if (!checkAvailability(dateStr, excursionId, persons)) {
+        const available = getAvailablePlaces(dateStr, excursionId);
+        alert(`Извините, на выбранную дату осталось только ${available} мест(а). Пожалуйста, выберите другое количество человек или другую дату.`);
+        return;
+    }
+    
+    const booking = saveBooking({
+        dateStr, excursionId, excursionName, time, price,
+        name, phone, email, persons, comment
+    });
+    
+    alert(`✅ Заявка успешно отправлена!\n\n📅 Экскурсия: ${excursionName}\n📆 Дата: ${dateFormatted} в ${time}\n👥 Количество человек: ${persons}\n💰 Сумма: ${price * persons} руб.\n\nСкоро с вами свяжется наш сотрудник для подтверждения.`);
+    
+    renderBothCalendars();
+    if (currentView === 'nearest') renderNearest();
+    
+    closeBookingForm();
+    form.reset();
+}
+
+// ========== БЛИЖАЙШИЕ ЭКСКУРСИИ ==========
+function switchView(view) {
+    currentView = view;
+    const calendarsContainer = document.getElementById('calendarsContainer');
+    const nearestEvents = document.getElementById('nearestEvents');
+    const calendarBtn = document.getElementById('calendarViewBtn');
+    const nearestBtn = document.getElementById('nearestViewBtn');
+    
+    if (!calendarsContainer || !nearestEvents) return;
+    
+    if (view === 'calendar') {
+        calendarsContainer.style.display = 'flex';
+        nearestEvents.style.display = 'none';
+        if (calendarBtn) calendarBtn.classList.add('active');
+        if (nearestBtn) nearestBtn.classList.remove('active');
+        renderBothCalendars();
+    } else {
+        calendarsContainer.style.display = 'none';
+        nearestEvents.style.display = 'block';
+        if (calendarBtn) calendarBtn.classList.remove('active');
+        if (nearestBtn) nearestBtn.classList.add('active');
+        renderNearest();
+    }
+}
+
+function renderNearest() {
+    const nearestList = document.getElementById('nearestList');
+    if (!nearestList) return;
+    
+    nearestList.innerHTML = '';
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    const futureDates = Object.keys(excursionsData)
+        .filter(dateStr => new Date(dateStr) >= today)
+        .sort();
+    
+    if (futureDates.length === 0) {
+        nearestList.innerHTML = '<p style="text-align:center; padding:20px;">Нет запланированных экскурсий</p>';
+        return;
+    }
+    
+    futureDates.forEach(dateStr => {
+        const [year, month, day] = dateStr.split('-');
+        const excursions = excursionsData[dateStr];
+        excursions.forEach(exc => {
+            const excDiv = document.createElement('div');
+            excDiv.className = 'excursion-item';
+            excDiv.innerHTML = `
+                <h4>${exc.name}</h4>
+                <p>📅 ${day}.${month}.${year} в ${exc.time}</p>
+                <p>💰 ${exc.price} руб./чел.</p>
+                <p class="excursion-places">📅 Свободно мест: ${exc.places}</p>
+            `;
+            excDiv.addEventListener('click', () => openModal(dateStr));
+            nearestList.appendChild(excDiv);
+        });
+    });
+}
+
+// ========== ФУНКЦИИ ПОИСКА ==========
+const pagesToSearch = [
+    { url: "index.html", title: "Экскурсии", description: "Запись на экскурсии в Мемориальной квартире поэта М.К. Луконина. Календарь, форма бронирования." },
+    { url: "muzey.html", title: "О музее", description: "История Мемориальной квартиры, коллекция, деятельность музея, практическая информация." },
+    { url: "biography.html", title: "Биография", description: "Биография поэта М.К. Луконина: детство, военные годы, творчество, наследие." },
+    { url: "virtual-tour.html", title: "Виртуальная экскурсия", description: "Виртуальная экскурсия по Мемориальной квартире. Экспонаты: подарки друзей, личные вещи, интерьеры." },
+    { url: "svo.html", title: "Для участников СВО", description: "Сервис QR-код для подтверждения статуса участника СВО. Льготы и бесплатное посещение музея." },
+    { url: "pushkin-card.html", title: "Пушкинская карта", description: "Программа Пушкинская карта для молодёжи. Мероприятия музея по Пушкинской карте на апрель 2026." }
+];
+
+const pageContent = {
+    "index.html": "Экскурсии Мемориальная квартира Луконин запись календарь бронирование форма заявки Пешеходная экскурсия по мемориальной квартире поэта Михаила Кузьмича Луконина место где сохранилась подлинная атмосфера его жизни и творчества Здесь вы увидите личные вещи библиотеку и подарки друзей ощутите гостеприимство волжского дома поэта Бурка и папаха от Расула Гамзатова Портрет Луконина работы Ильи Глазунова Детские разноцветные валенки от Маргариты Агашиной Портрет Эрнеста Хемингуэя Личная библиотека рукописи и сувениры из разных уголков земли г Волгоград ул Чуйкова 31 кв 47 Запись обязательна по телефону 8442 38-84-42 или через форму ниже Музей сохраняет главное качество гостеприимство",
+    "muzey.html": "О музее Мемориальная квартира поэта Михаила Кузьмича Луконина была открыта 25 октября 1978 года Волгоградский областной краеведческий музей Коллекция музея насчитывает более 2500 экспонатов Личная библиотека поэта рукописи подарки от друзей бурка и папаха от Расула Гамзатова портрет кисти Ильи Глазунова валенки от Маргариты Агашиной портрет Эрнеста Хемингуэя Адрес г Волгоград ул Чуйкова 31 кв 47 Телефон 8442 38-84-42",
+    "biography.html": "Биография Михаил Кузьмич Луконин родился в 1918 году советский поэт военный корреспондент лауреат Государственной премии СССР 1973 Участник Великой Отечественной войны награждён орденами и медалями После войны жил и работал в Волгограде Детство и юность Учился в Сталинградском педагогическом институте в Литературном институте в Москве Военные годы служил военным корреспондентом был ранен Творчество основные темы война труд любовь к Родине сборники стихов Лирика Перед рассветом Дорога в завтра Стихи Память Последние годы и наследие умер в 1976 году похоронен на Мамаевом кургане",
+    "virtual-tour.html": "Виртуальная экскурсия Экспонаты музея-квартиры Портрет Эрнеста Хемингуэя с дарственной надписью Бурка белая подарок от Расула Гамзатова Печатная машинка Consul и проигрыватель Sanyo Портрет Константина Симонова Картина Ф Суханов Буйство весны Картина У Байкала Интерьер квартиры Рабочий кабинет поэта Гостиная Документы фотографии и награды Коллекция веников Портрет поэта кисти Ильи Глазунова Вид на Волгу с балкона",
+    "svo.html": "СВО специальная военная операция QR-код для подтверждения статуса участника СВО Госуслуги Льготы для участников СВО в музее Бесплатное посещение всех экспозиций и выставок Волгоградский областной краеведческий музей Документы удостоверение ветерана боевых действий справка об участии в СВО удостоверение члена семьи погибшего ветерана свидетельство о рождении ребёнка Экскурсионное обслуживание скидки Телефон 8 8442 38-84-39",
+    "pushkin-card.html": "Пушкинская карта ВТБ с 2026 года оператором программы станет ВТБ Для молодёжи от 14 до 22 лет Ежегодно на неё начисляется 5 000 рублей Мероприятия по Пушкинской карте на апрель 2026 Экспозиции Волгоградского краеведческого музея Экскурсия История и традиции Волгоградской области Тематическая экскурсия Золотая кладовая Лекториум Пешеходные экскурсии Тайны Царицынских улиц Посиделки у поэта в мемориальной квартире"
+};
+
+function parseQuery(query) {
+    query = query.trim();
+    if (query.includes(" не ")) {
+        let parts = query.split(" не ");
+        return { type: "not", term1: parts[0].trim(), term2: parts[1].trim() };
+    } else if (query.includes(" или ")) {
+        let parts = query.split(" или ");
+        return { type: "or", term1: parts[0].trim(), term2: parts[1].trim() };
+    } else if (query.includes(" ")) {
+        let terms = query.split(" ").filter(t => t.length > 0);
+        return { type: "and", terms: terms };
+    } else {
+        return { type: "single", term: query };
+    }
+}
+
+function matchesQuery(content, parsedQuery) {
+    if (parsedQuery.type === "single") {
+        return content.toLowerCase().includes(parsedQuery.term.toLowerCase());
+    } else if (parsedQuery.type === "and") {
+        return parsedQuery.terms.every(term => content.toLowerCase().includes(term.toLowerCase()));
+    } else if (parsedQuery.type === "or") {
+        return content.toLowerCase().includes(parsedQuery.term1.toLowerCase()) || 
+               content.toLowerCase().includes(parsedQuery.term2.toLowerCase());
+    } else if (parsedQuery.type === "not") {
+        return content.toLowerCase().includes(parsedQuery.term1.toLowerCase()) && 
+               !content.toLowerCase().includes(parsedQuery.term2.toLowerCase());
+    }
+    return false;
+}
+
+function highlightText(text, query) {
+    if (!query) return text;
+    let words = query.split(" ").filter(w => w.length > 2);
+    let regex = new RegExp(`(${words.join("|")})`, "gi");
+    return text.replace(regex, '<mark class="search-highlight">$1</mark>');
+}
+
+function performSearch() {
+    const searchInput = document.getElementById('searchInput');
+    if (!searchInput) return;
+    
+    const query = searchInput.value.trim();
+    
+    if (!query) {
+        const resultsCount = document.getElementById('resultsCount');
+        const resultsList = document.getElementById('resultsList');
+        if (resultsCount) resultsCount.innerHTML = '';
+        if (resultsList) resultsList.innerHTML = '<p>Введите поисковый запрос.</p>';
+        return;
+    }
+
+    const parsedQuery = parseQuery(query);
+    const results = [];
+
+    for (const page of pagesToSearch) {
+        const content = pageContent[page.url] || "";
+        if (matchesQuery(content, parsedQuery)) {
+            let snippet = "";
+            let searchTerm = "";
+            if (parsedQuery.type === "single") searchTerm = parsedQuery.term;
+            else if (parsedQuery.type === "and") searchTerm = parsedQuery.terms[0];
+            else if (parsedQuery.type === "or") searchTerm = parsedQuery.term1;
+            else if (parsedQuery.type === "not") searchTerm = parsedQuery.term1;
+            
+            if (searchTerm && content.toLowerCase().includes(searchTerm.toLowerCase())) {
+                const index = content.toLowerCase().indexOf(searchTerm.toLowerCase());
+                const start = Math.max(0, index - 100);
+                const end = Math.min(content.length, index + searchTerm.length + 100);
+                snippet = content.substring(start, end);
+                snippet = highlightText(snippet, searchTerm);
+                if (start > 0) snippet = "..." + snippet;
+                if (end < content.length) snippet = snippet + "...";
+            } else {
+                snippet = content.substring(0, 200) + "...";
+            }
+            
+            results.push({
+                url: page.url,
+                title: page.title,
+                description: page.description,
+                snippet: snippet
+            });
+        }
+    }
+
+    const resultsCountDiv = document.getElementById('resultsCount');
+    const resultsListDiv = document.getElementById('resultsList');
+    
+    if (results.length === 0) {
+        if (resultsCountDiv) resultsCountDiv.innerHTML = `<p>По вашему запросу «${query}» ничего не найдено.</p>`;
+        if (resultsListDiv) resultsListDiv.innerHTML = '';
+    } else {
+        if (resultsCountDiv) resultsCountDiv.innerHTML = `<p>Предполагая слово(а) «${query}» обязательным, найдено ${results.length} элемент(ов).</p>`;
+        if (resultsListDiv) resultsListDiv.innerHTML = results.map(result => `
+            <div class="search-result-item">
+                <a href="${result.url}">${result.title}</a>
+                <div class="search-result-url">${result.url}</div>
+                <div class="search-result-snippet">${result.snippet}</div>
+            </div>
+        `).join('');
+    }
+}
+
+function initSearchPage() {
+    const searchButton = document.getElementById('searchButton');
+    const searchInput = document.getElementById('searchInput');
+    
+    if (searchButton) {
+        searchButton.addEventListener('click', performSearch);
+    }
+    if (searchInput) {
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') performSearch();
+        });
+    }
+    
+    const urlParams = new URLSearchParams(window.location.search);
+    const queryParam = urlParams.get('q');
+    if (queryParam && searchInput) {
+        searchInput.value = queryParam;
+        performSearch();
+    }
+}
+
+// ========== ИНИЦИАЛИЗАЦИЯ В ЗАВИСИМОСТИ ОТ СТРАНИЦЫ ==========
+function initCalendarPage() {
+    loadSavedData();
+    initDates();
+    renderBothCalendars();
+    
+    const prevBtn1 = document.getElementById('prevMonthBtn1');
+    const nextBtn1 = document.getElementById('nextMonthBtn1');
+    const prevBtn2 = document.getElementById('prevMonthBtn2');
+    const nextBtn2 = document.getElementById('nextMonthBtn2');
+    const calendarViewBtn = document.getElementById('calendarViewBtn');
+    const nearestViewBtn = document.getElementById('nearestViewBtn');
+    const modalClose = document.querySelector('.modal-close');
+    const bookingForm = document.getElementById('bookingForm');
+    const closeBookingBtn = document.getElementById('closeBookingForm');
+    const excursionModal = document.getElementById('excursionModal');
+    const bookingModal = document.getElementById('bookingFormModal');
+    
+    if (prevBtn1) prevBtn1.addEventListener('click', () => changeMonth(-1, false));
+    if (nextBtn1) nextBtn1.addEventListener('click', () => changeMonth(1, false));
+    if (prevBtn2) prevBtn2.addEventListener('click', () => changeMonth(-1, true));
+    if (nextBtn2) nextBtn2.addEventListener('click', () => changeMonth(1, true));
+    if (calendarViewBtn) calendarViewBtn.addEventListener('click', () => switchView('calendar'));
+    if (nearestViewBtn) nearestViewBtn.addEventListener('click', () => switchView('nearest'));
+    if (modalClose) modalClose.addEventListener('click', closeModal);
+    if (bookingForm) bookingForm.addEventListener('submit', handleBookingSubmit);
+    if (closeBookingBtn) closeBookingBtn.addEventListener('click', closeBookingForm);
+    
+    window.addEventListener('click', (e) => {
+        if (e.target === excursionModal) closeModal();
+        if (e.target === bookingModal) closeBookingForm();
+    });
+    
+    switchView('calendar');
+    showStats();
+    console.log('🎉 Музейный сайт загружен!');
+    console.log(`📧 Уведомления будут отправляться на: ${CONFIG.ADMIN_EMAIL}`);
+    console.log('💡 Для экспорта заявок: exportBookings()');
+    console.log('💡 Для просмотра статистики: showStats()');
+}
+
+// ========== ЗАПУСК ==========
+document.addEventListener('DOMContentLoaded', () => {
+    initLogoLink();
+    
+    if (document.getElementById('calendarDays1')) {
+        initCalendarPage();
+    }
+    
+    if (document.getElementById('searchButton')) {
+        initSearchPage();
+    }
+});

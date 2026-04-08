@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Экскурсии | Мемориальная квартира поэта М.К. Луконина</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- ШАПКА -->
+    <div class="header">
+        <div class="header-container">
+            <div class="logo-area" id="logoLink">
+                <img src="Images/muzey.png" alt="Логотип музея">
+                <div class="museum-title">
+                    Волгоградский областной<br>
+                    краеведческий музей
+                </div>
+            </div>
+            <div class="icons">
+                <a href="svo.html" class="svo-icon">
+                    <img src="Images/svo2.png" alt="СВО">
+                </a>
+                <a href="pushkin-card.html" class="pk-icon">
+                    <img src="Images/pk01.png" alt="Пушкинская карта">
+                </a>
+                <a href="https://vk.com/vokm134" target="_blank" class="vk-icon">
+                    <img src="Images/vk.png" alt="VK">
+                </a>
+                <a href="search.html" class="search-icon">
+                    <img src="Images/search.png" alt="Поиск">
+                </a>
+                <a href="javascript:void(0)" id="grayscaleBtn" class="view-icon">
+                    <img src="Images/view.png" alt="Режим чтения">
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- НАВИГАЦИЯ -->
+    <div class="nav">
+        <ul class="nav-list">
+            <li><a href="muzey.html" class="nav-item">О музее</a></li>
+            <li><a href="biography.html" class="nav-item">Биография</a></li>
+            <li><a href="virtual-tour.html" class="nav-item">Виртуальные экскурсии</a></li>
+            <li><a href="index.html" class="nav-item active">Экскурсии</a></li>
+        </ul>
+    </div>
+
+    <!-- БЛОК С ЗАГОЛОВКОМ -->
+    <div class="page-header">
+        <h1 class="page-header-title">Экскурсии в Мемориальной квартире поэта М.К. Луконина</h1>
+    </div>
+
+    <!-- ОСНОВНОЙ БЕЛЫЙ КОНТЕЙНЕР -->
+    <div class="main-content">
+        <div class="content-card">
+            <p class="invite-text">
+                Приглашаем вас на пешеходную экскурсию по мемориальной квартире поэта Михаила Кузьмича Луконина — месту, где сохранилась подлинная атмосфера его жизни и творчества. Здесь вы увидите личные вещи, библиотеку и подарки друзей, ощутите гостеприимство «волжского дома» поэта.
+            </p>
+            
+            <h2 class="section-title">Что вы увидите:</h2>
+            <ul class="exhibits-list">
+                <li>Бурка и папаха от Расула Гамзатова</li>
+                <li>Портрет Луконина работы Ильи Глазунова</li>
+                <li>Детские разноцветные валенки от Маргариты Агашиной</li>
+                <li>Портрет Эрнеста Хемингуэя</li>
+                <li>Личная библиотека, рукописи и сувениры из разных уголков земли</li>
+            </ul>
+            
+            <h2 class="section-title">Практическая информация:</h2>
+            <div class="info-block">
+                <p><strong>Место проведения:</strong> г. Волгоград, ул. Чуйкова, 31, кв. 47</p>
+                <p><strong>Запись обязательна:</strong> по телефону <a href="tel:8442388442">(8442) 38-84-42</a> или через форму ниже</p>
+                <p><strong>Особенность:</strong> Музей сохраняет главное качество — гостеприимство. Кажется, что хозяин по-прежнему радушно открывает двери для всех, кто готов войти в его мир.</p>
+            </div>
+
+            <!-- БЛОК С КАЛЕНДАРЕМ -->
+            <div class="booking-block">
+                <p class="booking-text">
+                    Выберите удобную дату и время для посещения в календаре ниже и заполните форму заявки. Наш сотрудник свяжется с вами для подтверждения записи.
+                </p>
+                
+                <div class="calendar-buttons">
+                    <button class="calendar-btn active" id="calendarViewBtn">Календарь</button>
+                    <button class="calendar-btn" id="nearestViewBtn">Ближайшие</button>
+                </div>
+                
+                <div class="calendars-container" id="calendarsContainer">
+                    <div class="calendar-single">
+                        <div class="calendar-header">
+                            <button class="calendar-nav prev" id="prevMonthBtn1">
+                                <img src="Images/arrow-left.png" alt="Предыдущий месяц">
+                            </button>
+                            <span class="calendar-month" id="currentMonth1">Апрель 2026</span>
+                            <button class="calendar-nav next" id="nextMonthBtn1">
+                                <img src="Images/arrow-right.png" alt="Следующий месяц">
+                            </button>
+                        </div>
+                        <div class="calendar-weekdays">
+                            <span>Пн</span><span>Вт</span><span>Ср</span><span>Чт</span><span>Пт</span><span>Сб</span><span>Вс</span>
+                        </div>
+                        <div class="calendar-days" id="calendarDays1"></div>
+                    </div>
+                    
+                    <div class="calendar-single">
+                        <div class="calendar-header">
+                            <button class="calendar-nav prev" id="prevMonthBtn2">
+                                <img src="Images/arrow-left.png" alt="Предыдущий месяц">
+                            </button>
+                            <span class="calendar-month" id="currentMonth2">Май 2026</span>
+                            <button class="calendar-nav next" id="nextMonthBtn2">
+                                <img src="Images/arrow-right.png" alt="Следующий месяц">
+                            </button>
+                        </div>
+                        <div class="calendar-weekdays">
+                            <span>Пн</span><span>Вт</span><span>Ср</span><span>Чт</span><span>Пт</span><span>Сб</span><span>Вс</span>
+                        </div>
+                        <div class="calendar-days" id="calendarDays2"></div>
+                    </div>
+                </div>
+                
+                <div class="nearest-events" id="nearestEvents" style="display: none;">
+                    <h3>Ближайшие экскурсии</h3>
+                    <div id="nearestList"></div>
+                </div>
+            </div>
+
+            <!-- МОДАЛЬНОЕ ОКНО ДЛЯ ВЫБОРА ЭКСКУРСИИ -->
+            <div class="modal" id="excursionModal">
+                <div class="modal-content">
+                    <span class="modal-close">&times;</span>
+                    <h3 id="modalDate"></h3>
+                    <div id="modalExcursionsList"></div>
+                </div>
+            </div>
+
+            <!-- ФОРМА ОФОРМЛЕНИЯ ЗАПИСИ -->
+            <div class="modal" id="bookingFormModal">
+                <div class="modal-content booking-form-modal">
+                    <span class="modal-close" id="closeBookingForm">&times;</span>
+                    <form id="bookingForm" class="booking-form">
+                        <div class="form-field">
+                            <label class="form-label">Поле "Ваше имя" (обязательное) *</label>
+                            <input type="text" class="form-input" placeholder="Иван Иванов" required>
+                        </div>
+                        
+                        <div class="form-field">
+                            <label class="form-label">Поле "Телефон" (обязательное) *</label>
+                            <input type="tel" class="form-input" placeholder="+7 (999) 999-99-99" required>
+                        </div>
+                        
+                        <div class="form-field">
+                            <label class="form-label">Поле "Email" (обязательное) *</label>
+                            <input type="email" class="form-input" placeholder="example@mail.ru" required>
+                        </div>
+                        
+                        <div class="form-field">
+                            <label class="form-label">Поле "Количество человек" (обязательное) *</label>
+                            <input type="number" class="form-input" value="1" min="1" required>
+                            <span class="form-hint places-hint"></span>
+                            <span class="form-hint">Более 5 (уточнить по телефону!)</span>
+                        </div>
+                        
+                        <div class="form-field">
+                            <label class="form-label">Поле "Комментарий"</label>
+                            <textarea class="form-textarea" placeholder="Особые пожелания, вопросы..."></textarea>
+                        </div>
+                        
+                        <div class="form-checkbox">
+                            <input type="checkbox" id="agreePersonal" required>
+                            <label for="agreePersonal">Согласен на обработку персональных данных</label>
+                        </div>
+                        
+                        <button type="submit" class="form-submit">Отправить заявку</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- ХЛЕБНЫЕ КРОШКИ -->
+            <div class="breadcrumbs">
+                <a href="muzey.html" class="breadcrumb-link">Главная</a>
+                <span class="breadcrumb-separator">/</span>
+                <span class="breadcrumb-current">Экскурсии</span>
+            </div>
+
+            <!-- ТЕКСТ ОБ АДМИНИСТРАЦИИ -->
+            <div class="admin-note">
+                <p>vokm@volganet.ru; www.vokm134.ru</p>
+                <p class="admin-note-asterisk">*Администрация оставляет за собой право изменить время и тему мероприятия.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ПОДВАЛ -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-row">
+                <div class="footer-social">
+                    <a href="https://vk.com/vokm134" target="_blank" class="social-link vk-link">
+                        <img src="Images/vk.png" alt="VK">
+                    </a>
+                    <a href="search.html" class="search-link">
+                        <img src="Images/search.png" alt="Поиск">
+                    </a>
+                </div>
+                <div class="footer-menu">
+                    <ul class="footer-nav-list">
+                        <li><a href="muzey.html">О музее</a></li>
+                        <li><a href="biography.html">Биография</a></li>
+                        <li><a href="virtual-tour.html">Виртуальные экскурсии</a></li>
+                        <li><a href="index.html">Экскурсии</a></li>
+                    </ul>
+                </div>
+                <div class="footer-contacts-group">
+                    <div class="footer-contacts">
+                        <p>400066, г. Волгоград, просп. Ленина, 7</p>
+                        <p><a href="mailto:vokm@volganet.ru">vokm@volganet.ru</a></p>
+                        <p>8 (8442) 38-84-39, 38-84-37</p>
+                    </div>
+                    <div class="footer-copyright">
+                        <p>© 2018–2026 Волгоградский областной краеведческий музей</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+</body>
+</html>

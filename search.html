@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Поиск по сайту | Мемориальная квартира поэта М.К. Луконина</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- ШАПКА -->
+    <div class="header">
+        <div class="header-container">
+            <div class="logo-area" id="logoLink">
+                <img src="Images/muzey.png" alt="Логотип музея">
+                <div class="museum-title">
+                    Волгоградский областной<br>
+                    краеведческий музей
+                </div>
+            </div>
+            <div class="icons">
+                <a href="svo.html" class="svo-icon">
+                    <img src="Images/svo2.png" alt="СВО">
+                </a>
+                <a href="pushkin-card.html" class="pk-icon">
+                    <img src="Images/pk01.png" alt="Пушкинская карта">
+                </a>
+                <a href="https://vk.com/vokm134" target="_blank" class="vk-icon">
+                    <img src="Images/vk.png" alt="VK">
+                </a>
+                <a href="search.html" class="search-icon">
+                    <img src="Images/search.png" alt="Поиск">
+                </a>
+                <a href="javascript:void(0)" id="grayscaleBtn" class="view-icon">
+                    <img src="Images/view.png" alt="Режим чтения">
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- НАВИГАЦИЯ -->
+    <div class="nav">
+        <ul class="nav-list">
+            <li><a href="muzey.html" class="nav-item">О музее</a></li>
+            <li><a href="biography.html" class="nav-item">Биография</a></li>
+            <li><a href="virtual-tour.html" class="nav-item">Виртуальные экскурсии</a></li>
+            <li><a href="index.html" class="nav-item">Экскурсии</a></li>
+        </ul>
+    </div>
+
+    <!-- БЛОК С ЗАГОЛОВКОМ -->
+    <div class="page-header">
+        <h1 class="page-header-title">Поиск по сайту</h1>
+    </div>
+
+    <!-- ОСНОВНОЙ БЕЛЫЙ КОНТЕЙНЕР -->
+    <div class="main-content">
+        <div class="content-card">
+            <div class="search-page-content">
+                <div class="search-form">
+                    <input type="text" id="searchInput" placeholder="Введите поисковый запрос..." value="">
+                    <button class="btn-search" id="searchButton">Найти</button>
+                </div>
+
+                <div class="search-examples">
+                    <p>📖 Примеры использования функции поиска:</p>
+                    <ul>
+                        <li><strong>Слово1 Слово2</strong> — будут показаны страницы, содержащие и слово "Слово1", и слово "Слово2".</li>
+                        <li><strong>Слово1 не Слово2</strong> — страницы, содержащие "Слово1", но не содержащие "Слово2".</li>
+                        <li><strong>Слово1 или Слово2</strong> — страницы, содержащие или "Слово1", или "Слово2".</li>
+                    </ul>
+                </div>
+
+                <div id="searchResults">
+                    <div class="search-results-count" id="resultsCount"></div>
+                    <div id="resultsList"></div>
+                </div>
+            </div>
+
+            <div class="breadcrumbs">
+                <a href="muzey.html" class="breadcrumb-link">Главная</a>
+                <span class="breadcrumb-separator">/</span>
+                <span class="breadcrumb-current">Поиск</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ПОДВАЛ -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-row">
+                <div class="footer-social">
+                    <a href="https://vk.com/vokm134" target="_blank" class="social-link vk-link">
+                        <img src="Images/vk.png" alt="VK">
+                    </a>
+                    <a href="search.html" class="search-link">
+                        <img src="Images/search.png" alt="Поиск">
+                    </a>
+                </div>
+                <div class="footer-menu">
+                    <ul class="footer-nav-list">
+                        <li><a href="muzey.html">О музее</a></li>
+                        <li><a href="biography.html">Биография</a></li>
+                        <li><a href="virtual-tour.html">Виртуальные экскурсии</a></li>
+                        <li><a href="index.html">Экскурсии</a></li>
+                    </ul>
+                </div>
+                <div class="footer-contacts-group">
+                    <div class="footer-contacts">
+                        <p>400066, г. Волгоград, просп. Ленина, 7</p>
+                        <p><a href="mailto:vokm@volganet.ru">vokm@volganet.ru</a></p>
+                        <p>8 (8442) 38-84-39, 38-84-37</p>
+                    </div>
+                    <div class="footer-copyright">
+                        <p>© 2018–2026 Волгоградский областной краеведческий музей</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+</body>
+</html>
