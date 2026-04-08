@@ -106,6 +106,7 @@ body {
     height: 37px;
     object-fit: contain;
     display: block;
+    cursor: pointer;
 }
 
 /* ========== НАВИГАЦИЯ ========== */
@@ -1198,6 +1199,689 @@ input[type="number"]::-webkit-outer-spin-button {
     text-decoration: underline;
 }
 
+/* ========== СТИЛИ ДЛЯ СТРАНИЦЫ ПОИСКА ========== */
+.search-page-content {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px 0;
+}
+
+.search-form {
+    margin-bottom: 40px;
+}
+
+.search-form input {
+    width: 100%;
+    padding: 15px 20px;
+    font-size: 18px;
+    font-family: 'Raleway', sans-serif;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #fff;
+    margin-bottom: 15px;
+}
+
+.search-form input:focus {
+    outline: none;
+    border-color: #6F6F6F;
+}
+
+.search-examples {
+    background-color: #F9F9F9;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 40px;
+}
+
+.search-examples p {
+    margin-bottom: 10px;
+    font-weight: 600;
+    font-size: 18px;
+    color: #333;
+}
+
+.search-examples ul {
+    margin-left: 25px;
+}
+
+.search-examples li {
+    margin-bottom: 8px;
+    font-size: 18px;
+    color: #555;
+    line-height: 1.5;
+}
+
+.search-results-count {
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #E5E5E5;
+    font-weight: 600;
+    color: #3D3D3D;
+    font-size: 18px;
+}
+
+.search-result-item {
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #E5E5E5;
+}
+
+.search-result-item a {
+    font-size: 20px;
+    font-weight: 700;
+    color: #6F6F6F;
+    text-decoration: none;
+    margin-bottom: 8px;
+    display: inline-block;
+}
+
+.search-result-item a:hover {
+    text-decoration: underline;
+}
+
+.search-result-url {
+    font-size: 14px;
+    color: #28a745;
+    margin-bottom: 8px;
+}
+
+.search-result-snippet {
+    font-size: 18px;
+    line-height: 1.5;
+    color: #555;
+}
+
+.search-highlight {
+    background-color: #FFF3E0;
+    font-weight: 600;
+    padding: 0 2px;
+}
+
+.btn-search {
+    background-color: #6F6F6F;
+    color: #F2EFDC;
+    border: none;
+    padding: 12px 30px;
+    font-size: 18px;
+    font-weight: 600;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    width: 100%;
+}
+
+.btn-search:hover {
+    background-color: #5a5a5a;
+}
+
+/* ========== ПАНЕЛЬ СПЕЦИАЛЬНЫХ ВОЗМОЖНОСТЕЙ ========== */
+.accessibility-panel {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 20000;
+    display: none;
+    justify-content: center;
+    align-items: center;
+}
+
+.accessibility-panel-inner {
+    background: white;
+    width: 400px;
+    max-width: 90%;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    animation: slideDown 0.2s ease;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.accessibility-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    background: #6F6F6F;
+    color: white;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.close-panel-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 28px;
+    cursor: pointer;
+    padding: 0 8px;
+}
+
+.close-panel-btn:hover {
+    opacity: 0.7;
+}
+
+.accessibility-body {
+    padding: 20px;
+}
+
+.accessibility-section {
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.section-title {
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: #333;
+    font-size: 14px;
+}
+
+.btn-group {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.access-btn {
+    padding: 8px 16px;
+    border: 1px solid #ddd;
+    background: #f5f5f5;
+    cursor: pointer;
+    border-radius: 25px;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.access-btn.active {
+    background: #6F6F6F;
+    color: white;
+    border-color: #6F6F6F;
+}
+
+.color-btn.active {
+    box-shadow: 0 0 0 2px #ff9800;
+}
+
+.reset-settings-btn {
+    width: 100%;
+    padding: 10px;
+    background: #ff9800;
+    color: white;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+.reset-settings-btn:hover {
+    background: #e68900;
+}
+
+/* ========== РЕЖИМЫ ДОСТУПНОСТИ ========== */
+body.font-small {
+    font-size: 14px;
+}
+
+body.font-large {
+    font-size: 18px;
+}
+
+body.font-xlarge {
+    font-size: 20px;
+}
+
+body.font-xlarge p,
+body.font-xlarge li,
+body.font-xlarge div:not(.accessibility-panel *) {
+    font-size: 20px;
+}
+
+body.spacing-wide {
+    letter-spacing: 0.5px;
+}
+
+body.spacing-xwide {
+    letter-spacing: 1px;
+}
+
+body.font-serif {
+    font-family: 'Georgia', 'Times New Roman', serif;
+}
+
+body.font-serif * {
+    font-family: 'Georgia', 'Times New Roman', serif;
+}
+
+/* ========== БЕЛО-ЧЁРНЫЙ РЕЖИМ ========== */
+body.color-dark {
+    background-color: #ffffff !important;
+}
+
+body.color-dark,
+body.color-dark .main-content,
+body.color-dark .page-header,
+body.color-dark .nav,
+body.color-dark .booking-block,
+body.color-dark .admin-note,
+body.color-dark .breadcrumbs {
+    background-color: #ffffff !important;
+}
+
+body.color-dark .content-card,
+body.color-dark .calendar-single,
+body.color-dark .modal-content,
+body.color-dark .excursion-item,
+body.color-dark .event-card,
+body.color-dark .museum-gallery img,
+body.color-dark .exhibit-card,
+body.color-dark .museum-info,
+body.color-dark .search-examples,
+body.color-dark .search-result-item {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    border-color: #cccccc !important;
+}
+
+body.color-dark .content-card {
+    box-shadow: none !important;
+}
+
+/* НАВИГАЦИЯ В БЕЛО-ЧЁРНОМ РЕЖИМЕ */
+body.color-dark .nav-item {
+    color: #000000 !important;
+    background-color: transparent !important;
+}
+
+body.color-dark .nav-item.active {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+}
+
+body.color-dark .nav-item:hover:not(.active) {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+}
+
+/* КАЛЕНДАРЬ */
+body.color-dark .calendar-day.available {
+    background-color: #e0e0e0 !important;
+    color: #000000 !important;
+}
+
+body.color-dark .calendar-day {
+    color: #000000 !important;
+}
+
+body.color-dark .calendar-weekdays span {
+    color: #666666 !important;
+}
+
+/* ТЕКСТЫ */
+body.color-dark p,
+body.color-dark h1,
+body.color-dark h2,
+body.color-dark h3,
+body.color-dark h4,
+body.color-dark li,
+body.color-dark .invite-text,
+body.color-dark .section-title,
+body.color-dark .booking-text,
+body.color-dark .admin-note,
+body.color-dark .breadcrumb-link,
+body.color-dark .breadcrumb-current {
+    color: #000000 !important;
+}
+
+/* ССЫЛКИ */
+body.color-dark a:not(.accessibility-panel a):not(.btn-booking):not(.form-submit):not(.nav-item) {
+    color: #000000 !important;
+    text-decoration: underline;
+}
+
+/* ПОДВАЛ */
+body.color-dark .footer {
+    background-color: #f0f0f0 !important;
+}
+
+body.color-dark .footer-nav-list li a,
+body.color-dark .footer-contacts p,
+body.color-dark .footer-copyright p,
+body.color-dark .footer-contacts a {
+    color: #000000 !important;
+}
+
+/* ФОРМЫ */
+body.color-dark .form-input,
+body.color-dark .form-textarea {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    border: 1px solid #cccccc;
+}
+
+body.color-dark .form-label,
+body.color-dark .form-checkbox label {
+    color: #000000 !important;
+}
+
+body.color-dark .form-submit {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+}
+
+body.color-dark .btn-booking {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+}
+
+/* МОДАЛЬНЫЕ ОКНА */
+body.color-dark .modal {
+    background-color: rgba(0, 0, 0, 0.5) !important;
+}
+
+body.color-dark .modal-content {
+    background-color: #ffffff !important;
+}
+
+body.color-dark .excursion-item h4,
+body.color-dark .excursion-item p {
+    color: #000000 !important;
+}
+
+/* СТРАНИЦА ЭКСКУРСИЙ */
+body.color-dark .exhibit-title,
+body.color-dark .exhibit-description {
+    color: #000000 !important;
+}
+
+body.color-dark .museum-block p,
+body.color-dark .museum-list li {
+    color: #000000 !important;
+}
+
+/* ПУШКИНСКАЯ КАРТА */
+body.color-dark .pushkin-page-content .event-card {
+    background-color: #ffffff !important;
+    border-color: #cccccc !important;
+}
+
+body.color-dark .pushkin-page-content .event-title,
+body.color-dark .pushkin-page-content .event-date,
+body.color-dark .pushkin-page-content .event-price {
+    color: #000000 !important;
+}
+
+/* СВО */
+body.color-dark .svo-page-content p,
+body.color-dark .svo-page-content li,
+body.color-dark .svo-page-content h2,
+body.color-dark .svo-page-content h3 {
+    color: #000000 !important;
+}
+
+/* ПОИСК */
+body.color-dark .search-result-item a,
+body.color-dark .search-result-snippet,
+body.color-dark .search-results-count {
+    color: #000000 !important;
+}
+
+/* БИОГРАФИЯ */
+body.color-dark .bio-text {
+    color: #000000 !important;
+}
+
+body.color-dark .museum-story p {
+    color: #000000 !important;
+}
+
+/* ========== СИНЯЯ ТЕМА ========== */
+body.color-blue {
+    background-color: #0a2f5a !important;
+    color: #ffffff !important;
+}
+
+body.color-blue,
+body.color-blue .main-content,
+body.color-blue .page-header,
+body.color-blue .nav,
+body.color-blue .booking-block,
+body.color-blue .admin-note,
+body.color-blue .breadcrumbs {
+    background-color: #0a2f5a !important;
+}
+
+body.color-blue .content-card,
+body.color-blue .calendar-single,
+body.color-blue .modal-content,
+body.color-blue .excursion-item,
+body.color-blue .event-card,
+body.color-blue .museum-gallery img,
+body.color-blue .exhibit-card,
+body.color-blue .museum-info,
+body.color-blue .search-examples,
+body.color-blue .search-result-item {
+    background-color: #0c3d6e !important;
+    color: #ffffff !important;
+    border-color: #1a5a8a !important;
+}
+
+/* ТЕКСТЫ В СИНЕЙ ТЕМЕ */
+body.color-blue p,
+body.color-blue h1,
+body.color-blue h2,
+body.color-blue h3,
+body.color-blue h4,
+body.color-blue li,
+body.color-blue .invite-text,
+body.color-blue .section-title,
+body.color-blue .booking-text,
+body.color-blue .admin-note,
+body.color-blue .breadcrumb-link,
+body.color-blue .breadcrumb-current,
+body.color-blue .exhibit-title,
+body.color-blue .exhibit-description,
+body.color-blue .museum-block p,
+body.color-blue .museum-list li,
+body.color-blue .bio-text,
+body.color-blue .museum-story p,
+body.color-blue .event-title,
+body.color-blue .event-date,
+body.color-blue .event-price,
+body.color-blue .svo-page-content p,
+body.color-blue .svo-page-content li,
+body.color-blue .svo-page-content h2,
+body.color-blue .svo-page-content h3,
+body.color-blue .search-result-item a,
+body.color-blue .search-result-snippet,
+body.color-blue .search-results-count {
+    color: #ffffff !important;
+}
+
+/* ССЫЛКИ В СИНЕЙ ТЕМЕ */
+body.color-blue a:not(.accessibility-panel a):not(.btn-booking):not(.form-submit):not(.nav-item) {
+    color: #ffd700 !important;
+    text-decoration: underline;
+}
+
+/* НАВИГАЦИЯ В СИНЕЙ ТЕМЕ */
+body.color-blue .nav-item {
+    color: #ffffff !important;
+    background-color: transparent !important;
+}
+
+body.color-blue .nav-item.active {
+    background-color: #ffd700 !important;
+    color: #0a2f5a !important;
+}
+
+body.color-blue .nav-item:hover:not(.active) {
+    background-color: #ffd700 !important;
+    color: #0a2f5a !important;
+}
+
+/* КАЛЕНДАРЬ В СИНЕЙ ТЕМЕ */
+body.color-blue .calendar-day.available {
+    background-color: #1a5a8a !important;
+    color: #ffd700 !important;
+}
+
+body.color-blue .calendar-day {
+    color: #ffffff !important;
+}
+
+body.color-blue .calendar-weekdays span {
+    color: #cccccc !important;
+}
+
+body.color-blue .calendar-month {
+    color: #ffffff !important;
+}
+
+/* ПОДВАЛ В СИНЕЙ ТЕМЕ */
+body.color-blue .footer {
+    background-color: #051f3a !important;
+}
+
+body.color-blue .footer-nav-list li a,
+body.color-blue .footer-contacts p,
+body.color-blue .footer-copyright p,
+body.color-blue .footer-contacts a {
+    color: #ffffff !important;
+}
+
+/* ФОРМЫ В СИНЕЙ ТЕМЕ */
+body.color-blue .form-input,
+body.color-blue .form-textarea {
+    background-color: #0c3d6e !important;
+    color: #ffffff !important;
+    border: 1px solid #1a5a8a !important;
+}
+
+body.color-blue .form-input::placeholder,
+body.color-blue .form-textarea::placeholder {
+    color: #cccccc !important;
+}
+
+body.color-blue .form-label,
+body.color-blue .form-checkbox label {
+    color: #ffffff !important;
+}
+
+body.color-blue .form-submit {
+    background-color: #ffd700 !important;
+    color: #0a2f5a !important;
+}
+
+body.color-blue .btn-booking {
+    background-color: #ffd700 !important;
+    color: #0a2f5a !important;
+}
+
+/* МОДАЛЬНЫЕ ОКНА В СИНЕЙ ТЕМЕ */
+body.color-blue .modal {
+    background-color: rgba(0, 0, 0, 0.7) !important;
+}
+
+body.color-blue .modal-content {
+    background-color: #0c3d6e !important;
+}
+
+body.color-blue .modal-close {
+    color: #ffd700 !important;
+}
+
+body.color-blue .excursion-item h4,
+body.color-blue .excursion-item p {
+    color: #ffffff !important;
+}
+
+body.color-blue .excursion-places {
+    color: #ffd700 !important;
+}
+
+/* ПУШКИНСКАЯ КАРТА В СИНЕЙ ТЕМЕ */
+body.color-blue .pushkin-page-content .event-card {
+    background-color: #0c3d6e !important;
+    border-color: #1a5a8a !important;
+}
+
+body.color-blue .pushkin-page-content .event-title,
+body.color-blue .pushkin-page-content .event-date,
+body.color-blue .pushkin-page-content .event-price {
+    color: #ffd700 !important;
+}
+
+/* ПОИСК В СИНЕЙ ТЕМЕ */
+body.color-blue .search-examples {
+    background-color: #0c3d6e !important;
+}
+
+body.color-blue .search-examples p,
+body.color-blue .search-examples li {
+    color: #ffffff !important;
+}
+
+body.color-blue .btn-search {
+    background-color: #ffd700 !important;
+    color: #0a2f5a !important;
+}
+
+/* КНОПКИ В СИНЕЙ ТЕМЕ */
+body.color-blue .calendar-btn {
+    background-color: #0c3d6e !important;
+    color: #ffffff !important;
+}
+
+body.color-blue .calendar-btn.active {
+    background-color: #ffd700 !important;
+    color: #0a2f5a !important;
+}
+
+body.color-blue .reset-settings-btn {
+    background-color: #ffd700 !important;
+    color: #0a2f5a !important;
+}
+
+body.color-blue .access-btn {
+    background-color: #0c3d6e !important;
+    color: #ffffff !important;
+    border-color: #1a5a8a !important;
+}
+
+body.color-blue .access-btn.active {
+    background-color: #ffd700 !important;
+    color: #0a2f5a !important;
+}
+
+body.color-blue .section-title {
+    color: #ffd700 !important;
+}
+
+/* ========== ОТКЛЮЧЕНИЕ ИЗОБРАЖЕНИЙ (КРОМЕ КНОПОК В ШАПКЕ) ========== */
+body.images-off img:not(.accessibility-panel img):not(.view-icon img):not(.svo-icon img):not(.pk-icon img):not(.vk-icon img):not(.search-icon img) {
+    display: none !important;
+}
+
+/* ========== ЧЁРНО-БЕЛЫЙ РЕЖИМ ДЛЯ ВСЕГО САЙТА (ПО КНОПКЕ view.png) ========== */
+html {
+    transition: filter 0.3s ease;
+}
+
 /* ========== АДАПТИВНОСТЬ ========== */
 @media (max-width: 1240px) {
     .header-container {
@@ -1443,183 +2127,4 @@ input[type="number"]::-webkit-outer-spin-button {
         width: 44px;
         height: 44px;
     }
-
-    /* ========== ДОПОЛНИТЕЛЬНЫЕ СТИЛИ ДЛЯ СТРАНИЦЫ ПОИСКА ========== */
-.search-page-content {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 20px 0;
-}
-.search-form {
-    margin-bottom: 40px;
-}
-.search-form input {
-    width: 100%;
-    padding: 15px 20px;
-    font-size: 18px;
-    font-family: 'Raleway', sans-serif;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    background-color: #fff;
-    margin-bottom: 15px;
-}
-.search-form input:focus {
-    outline: none;
-    border-color: #6F6F6F;
-}
-.search-examples {
-    background-color: #F9F9F9;
-    padding: 20px;
-    border-radius: 8px;
-    margin-bottom: 40px;
-}
-.search-examples p {
-    margin-bottom: 10px;
-    font-weight: 600;
-    font-size: 18px;
-    color: #333;
-}
-.search-examples ul {
-    margin-left: 25px;
-}
-.search-examples li {
-    margin-bottom: 8px;
-    font-size: 18px;
-    color: #555;
-    line-height: 1.5;
-}
-.search-results-count {
-    margin-bottom: 25px;
-    padding-bottom: 15px;
-    border-bottom: 1px solid #E5E5E5;
-    font-weight: 600;
-    color: #3D3D3D;
-    font-size: 18px;
-}
-.search-result-item {
-    margin-bottom: 30px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid #E5E5E5;
-}
-.search-result-item a {
-    font-size: 20px;
-    font-weight: 700;
-    color: #6F6F6F;
-    text-decoration: none;
-    margin-bottom: 8px;
-    display: inline-block;
-}
-.search-result-item a:hover {
-    text-decoration: underline;
-}
-.search-result-url {
-    font-size: 14px;
-    color: #28a745;
-    margin-bottom: 8px;
-}
-.search-result-snippet {
-    font-size: 18px;
-    line-height: 1.5;
-    color: #555;
-}
-.search-highlight {
-    background-color: #FFF3E0;
-    font-weight: 600;
-    padding: 0 2px;
-}
-.btn-search {
-    background-color: #6F6F6F;
-    color: #F2EFDC;
-    border: none;
-    padding: 12px 30px;
-    font-size: 18px;
-    font-weight: 600;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-    width: 100%;
-}
-.btn-search:hover {
-    background-color: #5a5a5a;
-}
-
-/* ========== СТИЛИ ДЛЯ СТРАНИЦЫ ПУШКИНСКОЙ КАРТЫ ========== */
-.pushkin-page-content {
-    max-width: 1000px;
-    margin: 0 auto;
-    padding: 20px 0;
-}
-.pushkin-page-content h2 {
-    margin-top: 35px;
-    margin-bottom: 15px;
-    font-size: 24px;
-    color: #000000;
-}
-.pushkin-page-content .event-card {
-    background-color: #F9F9F9;
-    padding: 20px;
-    border-radius: 8px;
-    margin-bottom: 20px;
-    border: 1px solid #E5E5E5;
-}
-.pushkin-page-content .event-title {
-    font-weight: 700;
-    font-size: 20px;
-    color: #6F6F6F;
-    margin-bottom: 10px;
-}
-.pushkin-page-content .event-date {
-    color: #666;
-    margin-bottom: 10px;
-    font-size: 16px;
-}
-.pushkin-page-content .event-price {
-    font-weight: 700;
-    color: #000000;
-    margin-top: 10px;
-}
-.pushkin-page-content .phone-link {
-    color: #6F6F6F;
-    text-decoration: none;
-    font-weight: 600;
-}
-.pushkin-page-content .phone-link:hover {
-    text-decoration: underline;
-}
-
-/* ========== СТИЛИ ДЛЯ СТРАНИЦЫ СВО ========== */
-.svo-page-content {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 20px 0;
-}
-.svo-page-content .qr-code {
-    text-align: center;
-    margin: 30px 0;
-}
-.svo-page-content .qr-code img {
-    max-width: 300px;
-    width: 100%;
-    margin-bottom: 15px;
-}
-.svo-page-content .service-link {
-    display: inline-block;
-    background-color: #6F6F6F;
-    color: #F2EFDC;
-    padding: 10px 20px;
-    border-radius: 4px;
-    text-decoration: none;
-    margin: 15px 0;
-    transition: background-color 0.2s;
-}
-.svo-page-content .service-link:hover {
-    background-color: #5a5a5a;
-}
-.svo-page-content .important-block {
-    background-color: transparent;
-    padding: 0;
-    border-left: none;
-    margin: 20px 0;
-}
-
 }

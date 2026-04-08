@@ -422,7 +422,6 @@ async function saveBookingToSupabase(bookingData) {
         
         console.log('✅ Бронирование сохранено в Supabase, код:', bookingCode);
         
-        // Обновляем локальные данные
         if (excursionsData[dateStr]) {
             const excIndex = excursionsData[dateStr].findIndex(e => e.id === excursionId);
             if (excIndex !== -1) {
@@ -515,15 +514,6 @@ async function handleBookingSubmit(event) {
 }
 
 // ========== ОБЩИЕ ФУНКЦИИ ==========
-function toggleGrayscale() {
-    const html = document.documentElement;
-    if (html.style.filter === 'grayscale(100%)') {
-        html.style.filter = 'none';
-    } else {
-        html.style.filter = 'grayscale(100%)';
-    }
-}
-
 function initLogoLink() {
     const logoLink = document.getElementById('logoLink');
     if (logoLink) {
@@ -533,12 +523,40 @@ function initLogoLink() {
     }
 }
 
+// ========== ЧЁРНО-БЕЛЫЙ РЕЖИМ (РАБОТАЕТ НА ВСЕХ СТРАНИЦАХ) ==========
+function toggleGrayscale() {
+    const html = document.documentElement;
+    if (html.style.filter === 'grayscale(100%)') {
+        html.style.filter = 'none';
+        localStorage.setItem('grayscaleMode', 'off');
+        console.log('🌈 Цветной режим включен');
+    } else {
+        html.style.filter = 'grayscale(100%)';
+        localStorage.setItem('grayscaleMode', 'on');
+        console.log('⚫ Чёрно-белый режим включен');
+    }
+}
+
+// Загрузка сохранённого режима при загрузке страницы
+function loadGrayscaleMode() {
+    const savedMode = localStorage.getItem('grayscaleMode');
+    if (savedMode === 'on') {
+        document.documentElement.style.filter = 'grayscale(100%)';
+        console.log('⚫ Загружен чёрно-белый режим');
+    }
+}
+
 // ========== ИНИЦИАЛИЗАЦИЯ ==========
 document.addEventListener('DOMContentLoaded', () => {
     initLogoLink();
     initDates();
     
-    // Навешиваем обработчики календаря
+    // Кнопка чёрно-белого режима
+    const grayscaleBtn = document.getElementById('grayscaleBtn');
+    if (grayscaleBtn) {
+        grayscaleBtn.addEventListener('click', toggleGrayscale);
+    }
+    
     const prevBtn1 = document.getElementById('prevMonthBtn1');
     const nextBtn1 = document.getElementById('nextMonthBtn1');
     const prevBtn2 = document.getElementById('prevMonthBtn2');
@@ -559,7 +577,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (closeBookingBtn) closeBookingBtn.addEventListener('click', closeBookingForm);
     if (bookingForm) bookingForm.addEventListener('submit', handleBookingSubmit);
     
-    // Обработка клика вне модальных окон
     window.addEventListener('click', (e) => {
         const excursionModal = document.getElementById('excursionModal');
         const bookingModal = document.getElementById('bookingFormModal');
@@ -567,17 +584,16 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.target === bookingModal) closeBookingForm();
     });
     
-    // Подключаем Supabase (данные загрузятся автоматически)
-    initSupabase();
+    // Загружаем сохранённый чёрно-белый режим
+    loadGrayscaleMode();
     
-    // Показываем календарь
+    initSupabase();
     switchView('calendar');
     
     console.log('🎉 Сайт готов к работе!');
-    console.log('💡 Для просмотра статистики в консоли: showStats()');
 });
 
-// ========== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ДЛЯ АДМИНИСТРАТОРА ==========
+// ========== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ==========
 function showStats() {
     const bookings = JSON.parse(localStorage.getItem('bookings') || '[]');
     console.log('\n📊 ===== СТАТИСТИКА =====');
