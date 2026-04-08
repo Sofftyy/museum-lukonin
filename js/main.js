@@ -4,6 +4,9 @@ const CONFIG = {
     SITE_URL: 'https://vokm134.ru'
 };
 
+// ========== EMAILJS ИНИЦИАЛИЗАЦИЯ ==========
+emailjs.init('amraDdYtetS2ES2do');
+
 // ========== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ==========
 let excursionsData = {};
 let currentDate1 = new Date();
@@ -50,6 +53,38 @@ function getLocalExcursionsData() {
 function initLocalData() {
     excursionsData = getLocalExcursionsData();
     console.log('📦 Локальные данные загружены');
+}
+
+// ========== ОТПРАВКА EMAIL ЧЕРЕЗ EMAILJS ==========
+async function sendEmailNotification(bookingData) {
+    const { name, phone, email, excursionName, dateFormatted, time, persons, totalPrice, comment } = bookingData;
+    
+    console.log('📧 Отправка email на midex1337@mail.ru...');
+    
+    try {
+        const result = await emailjs.send(
+            'service_2gyjty2',           // Service ID
+            'template_8ggpirs',          // Template ID (правильный!)
+            {
+                name: name,
+                phone: phone,
+                user_email: email,
+                excursion: excursionName,
+                date: dateFormatted,
+                time: time,
+                persons: persons,
+                total: totalPrice,
+                comment: comment || 'Нет'
+            }
+        );
+        console.log('✅ Email успешно отправлен!', result);
+        return true;
+    } catch (error) {
+        console.error('❌ Ошибка отправки email:', error);
+        console.error('Статус:', error.status);
+        console.error('Текст:', error.text);
+        return false;
+    }
 }
 
 // ========== ПОДКЛЮЧЕНИЕ К SUPABASE ==========
@@ -504,6 +539,19 @@ async function handleBookingSubmit(event) {
     
     if (booking) {
         alert(`✅ Заявка успешно отправлена!\n\n📅 Экскурсия: ${excursionName}\n📆 Дата: ${dateFormatted} в ${time}\n👥 Количество: ${persons}\n💰 Сумма: ${price * persons} руб.\n\nСкоро с вами свяжется сотрудник музея.`);
+        
+        // Отправка email уведомления
+        await sendEmailNotification({
+            name: name,
+            phone: phone,
+            email: email,
+            excursionName: excursionName,
+            dateFormatted: dateFormatted,
+            time: time,
+            persons: persons,
+            totalPrice: price * persons,
+            comment: comment
+        });
         
         renderBothCalendars();
         if (currentView === 'nearest') renderNearest();
