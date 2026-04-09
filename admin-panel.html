@@ -11,6 +11,32 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
     <script src="js/supabase-config.js"></script>
     <script src="js/admin.js"></script>
+    <script>
+        // Форсированная загрузка для admin-panel
+        (function() {
+            console.log('🔍 Дополнительный скрипт admin-panel запущен');
+            
+            function forceLoad() {
+                if (typeof loadAdminPanelData === 'function') {
+                    console.log('✅ loadAdminPanelData найдена, вызываем');
+                    loadAdminPanelData();
+                } else if (typeof initSupabase === 'function') {
+                    console.log('✅ initSupabase найдена, вызываем');
+                    initSupabase();
+                } else {
+                    console.log('❌ Функции не найдены, ждём...');
+                    setTimeout(forceLoad, 500);
+                }
+            }
+            
+            // Ждём загрузки страницы
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', forceLoad);
+            } else {
+                setTimeout(forceLoad, 200);
+            }
+        })();
+    </script>
 </head>
 <body>
     <div class="admin-header">
