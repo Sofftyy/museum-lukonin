@@ -63,8 +63,8 @@ async function sendEmailNotification(bookingData) {
     
     try {
         const result = await emailjs.send(
-            'service_2gyjty2',           // Service ID
-            'template_8ggpirs',          // Template ID
+            'service_2gyjty2',
+            'template_8ggpirs',
             {
                 name: name,
                 phone: phone,
@@ -540,7 +540,6 @@ async function handleBookingSubmit(event) {
     if (booking) {
         alert(`✅ Заявка успешно отправлена!\n\n📅 Экскурсия: ${excursionName}\n📆 Дата: ${dateFormatted} в ${time}\n👥 Количество: ${persons}\n💰 Сумма: ${price * persons} руб.\n\nСкоро с вами свяжется сотрудник музея.`);
         
-        // Отправка email уведомления
         await sendEmailNotification({
             name: name,
             phone: phone,
@@ -571,7 +570,7 @@ function initLogoLink() {
     }
 }
 
-// ========== ЧЁРНО-БЕЛЫЙ РЕЖИМ (РАБОТАЕТ НА ВСЕХ СТРАНИЦАХ) ==========
+// ========== ЧЁРНО-БЕЛЫЙ РЕЖИМ ==========
 function toggleGrayscale() {
     const html = document.documentElement;
     if (html.style.filter === 'grayscale(100%)') {
@@ -585,7 +584,6 @@ function toggleGrayscale() {
     }
 }
 
-// Загрузка сохранённого режима при загрузке страницы
 function loadGrayscaleMode() {
     const savedMode = localStorage.getItem('grayscaleMode');
     if (savedMode === 'on') {
@@ -600,7 +598,6 @@ function initMobileMenu() {
     
     if (document.querySelector('.mobile-nav-bar')) return;
     
-    // Создаём полосу с бургер-меню
     const navBar = document.createElement('div');
     navBar.className = 'mobile-nav-bar';
     navBar.innerHTML = `
@@ -612,11 +609,9 @@ function initMobileMenu() {
         </div>
     `;
     
-    // Создаём выезжающее меню
     const mobileMenu = document.createElement('div');
     mobileMenu.className = 'mobile-menu';
     
-    // Копируем ссылки из оригинальной навигации
     const originalNav = document.querySelector('.nav');
     const navList = originalNav ? originalNav.querySelector('.nav-list') : null;
     
@@ -633,12 +628,10 @@ function initMobileMenu() {
         mobileMenu.appendChild(newNavList);
     }
     
-    // Вставляем элементы на страницу
     const header = document.querySelector('.header');
     header.insertAdjacentElement('afterend', navBar);
     document.body.appendChild(mobileMenu);
     
-    // Открытие/закрытие меню
     const burgerIcon = navBar.querySelector('.burger-icon');
     
     function toggleMenu() {
@@ -648,7 +641,6 @@ function initMobileMenu() {
     
     navBar.addEventListener('click', toggleMenu);
     
-    // Закрываем меню при клике на ссылку
     const menuLinks = mobileMenu.querySelectorAll('a');
     menuLinks.forEach(link => {
         link.addEventListener('click', function() {
@@ -657,7 +649,6 @@ function initMobileMenu() {
         });
     });
     
-    // Закрываем меню при клике на затемнённую область
     document.body.addEventListener('click', function(e) {
         if (mobileMenu.classList.contains('open') && 
             !mobileMenu.contains(e.target) && 
@@ -668,7 +659,6 @@ function initMobileMenu() {
     });
 }
 
-// При изменении размера окна
 window.addEventListener('resize', function() {
     const mobileNavBar = document.querySelector('.mobile-nav-bar');
     const mobileMenu = document.querySelector('.mobile-menu');
@@ -684,59 +674,7 @@ window.addEventListener('resize', function() {
     }
 });
 
-// ========== ИНИЦИАЛИЗАЦИЯ ==========
-document.addEventListener('DOMContentLoaded', () => {
-    initLogoLink();
-    initDates();
-    
-    // Кнопка чёрно-белого режима
-    const grayscaleBtn = document.getElementById('grayscaleBtn');
-    if (grayscaleBtn) {
-        grayscaleBtn.addEventListener('click', toggleGrayscale);
-    }
-    
-    const prevBtn1 = document.getElementById('prevMonthBtn1');
-    const nextBtn1 = document.getElementById('nextMonthBtn1');
-    const prevBtn2 = document.getElementById('prevMonthBtn2');
-    const nextBtn2 = document.getElementById('nextMonthBtn2');
-    const calendarViewBtn = document.getElementById('calendarViewBtn');
-    const nearestViewBtn = document.getElementById('nearestViewBtn');
-    const modalClose = document.querySelector('.modal-close');
-    const closeBookingBtn = document.getElementById('closeBookingForm');
-    const bookingForm = document.getElementById('bookingForm');
-    
-    if (prevBtn1) prevBtn1.addEventListener('click', () => changeMonth(-1, false));
-    if (nextBtn1) nextBtn1.addEventListener('click', () => changeMonth(1, false));
-    if (prevBtn2) prevBtn2.addEventListener('click', () => changeMonth(-1, true));
-    if (nextBtn2) nextBtn2.addEventListener('click', () => changeMonth(1, true));
-    if (calendarViewBtn) calendarViewBtn.addEventListener('click', () => switchView('calendar'));
-    if (nearestViewBtn) nearestViewBtn.addEventListener('click', () => switchView('nearest'));
-    if (modalClose) modalClose.addEventListener('click', closeModal);
-    if (closeBookingBtn) closeBookingBtn.addEventListener('click', closeBookingForm);
-    if (bookingForm) bookingForm.addEventListener('submit', handleBookingSubmit);
-    
-    window.addEventListener('click', (e) => {
-        const excursionModal = document.getElementById('excursionModal');
-        const bookingModal = document.getElementById('bookingFormModal');
-        if (e.target === excursionModal) closeModal();
-        if (e.target === bookingModal) closeBookingForm();
-    });
-    
-    // Загружаем сохранённый чёрно-белый режим
-    loadGrayscaleMode();
-    
-    // Инициализируем бургер-меню для мобильных
-    initMobileMenu();
-    
-    initSupabase();
-    switchView('calendar');
-    
-    console.log('🎉 Сайт готов к работе!');
-});
-
-
 // ========== ПОИСК ПО САЙТУ ==========
-// Список страниц для поиска
 const pagesToSearch = [
     { url: "index.html", title: "Экскурсии", description: "Запись на экскурсии в Мемориальной квартире поэта М.К. Луконина. Календарь, форма бронирования." },
     { url: "muzey.html", title: "О музее", description: "История Мемориальной квартиры, коллекция, деятельность музея, практическая информация." },
@@ -746,7 +684,6 @@ const pagesToSearch = [
     { url: "pushkin-card.html", title: "Пушкинская карта", description: "Программа Пушкинская карта для молодёжи. Мероприятия музея по Пушкинской карте." }
 ];
 
-// Содержимое страниц для поиска
 const pageContent = {
     "index.html": "Экскурсии Мемориальная квартира Луконин запись календарь бронирование форма заявки Пешеходная экскурсия по мемориальной квартире поэта Михаила Кузьмича Луконина место где сохранилась подлинная атмосфера его жизни и творчества Здесь вы увидите личные вещи библиотеку и подарки друзей ощутите гостеприимство волжского дома поэта Бурка и папаха от Расула Гамзатова Портрет Луконина работы Ильи Глазунова Детские разноцветные валенки от Маргариты Агашиной Портрет Эрнеста Хемингуэя Личная библиотека рукописи и сувениры из разных уголков земли г Волгоград ул Чуйкова 31 кв 47 Запись обязательна по телефону 8442 38-84-42 или через форму ниже Музей сохраняет главное качество гостеприимство",
     "muzey.html": "О музее Мемориальная квартира поэта Михаила Кузьмича Луконина была открыта 25 октября 1978 года Волгоградский областной краеведческий музей Коллекция музея насчитывает более 2500 экспонатов Личная библиотека поэта рукописи подарки от друзей бурка и папаха от Расула Гамзатова портрет кисти Ильи Глазунова валенки от Маргариты Агашиной портрет Эрнеста Хемингуэя Адрес г Волгоград ул Чуйкова 31 кв 47 Телефон 8442 38-84-42",
@@ -860,32 +797,69 @@ function performSearch() {
     }
 }
 
-// Инициализация поиска на странице search.html
-function initSearchPage() {
+// ========== ИНИЦИАЛИЗАЦИЯ ==========
+document.addEventListener('DOMContentLoaded', () => {
+    initLogoLink();
+    initDates();
+    
+    const grayscaleBtn = document.getElementById('grayscaleBtn');
+    if (grayscaleBtn) {
+        grayscaleBtn.addEventListener('click', toggleGrayscale);
+    }
+    
+    const prevBtn1 = document.getElementById('prevMonthBtn1');
+    const nextBtn1 = document.getElementById('nextMonthBtn1');
+    const prevBtn2 = document.getElementById('prevMonthBtn2');
+    const nextBtn2 = document.getElementById('nextMonthBtn2');
+    const calendarViewBtn = document.getElementById('calendarViewBtn');
+    const nearestViewBtn = document.getElementById('nearestViewBtn');
+    const modalClose = document.querySelector('.modal-close');
+    const closeBookingBtn = document.getElementById('closeBookingForm');
+    const bookingForm = document.getElementById('bookingForm');
+    
+    if (prevBtn1) prevBtn1.addEventListener('click', () => changeMonth(-1, false));
+    if (nextBtn1) nextBtn1.addEventListener('click', () => changeMonth(1, false));
+    if (prevBtn2) prevBtn2.addEventListener('click', () => changeMonth(-1, true));
+    if (nextBtn2) nextBtn2.addEventListener('click', () => changeMonth(1, true));
+    if (calendarViewBtn) calendarViewBtn.addEventListener('click', () => switchView('calendar'));
+    if (nearestViewBtn) nearestViewBtn.addEventListener('click', () => switchView('nearest'));
+    if (modalClose) modalClose.addEventListener('click', closeModal);
+    if (closeBookingBtn) closeBookingBtn.addEventListener('click', closeBookingForm);
+    if (bookingForm) bookingForm.addEventListener('submit', handleBookingSubmit);
+    
+    window.addEventListener('click', (e) => {
+        const excursionModal = document.getElementById('excursionModal');
+        const bookingModal = document.getElementById('bookingFormModal');
+        if (e.target === excursionModal) closeModal();
+        if (e.target === bookingModal) closeBookingForm();
+    });
+    
+    loadGrayscaleMode();
+    initMobileMenu();
+    initSupabase();
+    switchView('calendar');
+    
+    // Инициализация поиска (работает только на странице search.html)
     const searchButton = document.getElementById('searchButton');
     const searchInput = document.getElementById('searchInput');
     
-    if (searchButton) {
+    if (searchButton && searchInput) {
+        console.log('🔍 Поиск инициализирован');
         searchButton.addEventListener('click', performSearch);
-    }
-    if (searchInput) {
         searchInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') performSearch();
         });
+        
+        const urlParams = new URLSearchParams(window.location.search);
+        const queryParam = urlParams.get('q');
+        if (queryParam) {
+            searchInput.value = queryParam;
+            performSearch();
+        }
     }
     
-    const urlParams = new URLSearchParams(window.location.search);
-    const queryParam = urlParams.get('q');
-    if (queryParam && searchInput) {
-        searchInput.value = queryParam;
-        performSearch();
-    }
-}
-
-// Запускаем поиск, если мы на странице search.html
-if (window.location.pathname.includes('search.html')) {
-    document.addEventListener('DOMContentLoaded', initSearchPage);
-}
+    console.log('🎉 Сайт готов к работе!');
+});
 
 // ========== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ==========
 function showStats() {
