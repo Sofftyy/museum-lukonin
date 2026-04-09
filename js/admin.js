@@ -54,7 +54,6 @@ async function initSupabase() {
     const currentPage = window.location.pathname;
     console.log('📄 Текущая страница:', currentPage);
     
-    // Загружаем данные в зависимости от страницы
     if (currentPage.includes('admin-panel.html')) {
         console.log('➡️ Загружаем admin-panel');
         await loadAdminPanelData();
@@ -93,20 +92,16 @@ async function loadAdminPanelData() {
         console.log('📊 Данные загружены, количество:', bookings ? bookings.length : 0);
         
         if (!bookings || bookings.length === 0) {
-            console.log('⚠️ Нет данных в таблице bookings');
             const container = document.getElementById('recentBookingsTable');
             if (container) container.innerHTML = '<p style="padding:20px;">Нет заявок в базе данных</p>';
             return;
         }
         
-        // Сохраняем в глобальную переменную
         allBookings = bookings;
         
         const totalBookings = bookings.length;
         const pendingBookings = bookings.filter(b => b.status === 'pending').length;
         const confirmedBookings = bookings.filter(b => b.status === 'confirmed').length;
-        
-        console.log('📈 Статистика:', { totalBookings, pendingBookings, confirmedBookings });
         
         const totalEl = document.getElementById('totalBookings');
         const pendingEl = document.getElementById('pendingBookings');
@@ -129,19 +124,12 @@ async function loadAdminPanelData() {
 
 function renderRecentBookings(bookings) {
     const container = document.getElementById('recentBookingsTable');
-    console.log('🎨 renderRecentBookings, контейнер найден:', !!container);
-    
-    if (!container) {
-        console.error('❌ Контейнер recentBookingsTable не найден!');
-        return;
-    }
+    if (!container) return;
     
     if (!bookings || bookings.length === 0) {
         container.innerHTML = '<p style="padding:20px;">Нет заявок</p>';
         return;
     }
-    
-    console.log('📝 Рендерим', bookings.length, 'заявок');
     
     let html = `<table>
         <thead>
@@ -182,7 +170,6 @@ function renderRecentBookings(bookings) {
     
     html += `</tbody></table>`;
     container.innerHTML = html;
-    console.log('✅ Таблица отрендерена');
 }
 
 // ========== ДЛЯ СТРАНИЦЫ admin-bookings.html ==========
@@ -212,7 +199,7 @@ async function loadAllBookings() {
         console.error('❌ Ошибка загрузки:', err);
         const tableContainer = document.getElementById('bookingsTable');
         if (tableContainer) {
-            tableContainer.innerHTML = '<p style="padding:20px;">Ошибка загрузки数据</p>';
+            tableContainer.innerHTML = '<p style="padding:20px;">Ошибка загрузки данных</p>';
         }
     }
 }
@@ -226,7 +213,7 @@ function renderAllBookingsTable(bookings) {
         return;
     }
     
-    let html = `<table>
+    let html = `</table>
         <thead>
             <tr>
                 <th>ID</th>
@@ -275,7 +262,13 @@ function renderAllBookingsTable(bookings) {
 
 // ========== ОБНОВЛЕНИЕ СТАТУСА ==========
 async function updateBookingStatus(bookingId, newStatus) {
-    if (!supabaseAdmin) return;
+    console.log('🔄 updateBookingStatus вызвана:', bookingId, newStatus);
+    
+    if (!supabaseAdmin) {
+        console.error('❌ supabaseAdmin не инициализирован');
+        alert('Ошибка: не подключено к базе данных');
+        return;
+    }
     
     try {
         const { error } = await supabaseAdmin
@@ -285,18 +278,18 @@ async function updateBookingStatus(bookingId, newStatus) {
         
         if (error) throw error;
         
-        alert(`Статус заявки изменён на "${newStatus === 'confirmed' ? 'Подтверждена' : 'Отменена'}"`);
+        alert(`✅ Статус заявки изменён на "${newStatus === 'confirmed' ? 'Подтверждена' : 'Отменена'}"`);
         
         const currentPage = window.location.pathname;
         if (currentPage.includes('admin-panel.html')) {
-            loadAdminPanelData();
+            await loadAdminPanelData();
         } else if (currentPage.includes('admin-bookings.html')) {
-            loadAllBookings();
+            await loadAllBookings();
         }
         
     } catch (err) {
         console.error('❌ Ошибка обновления:', err);
-        alert('Ошибка при обновлении статуса');
+        alert('Ошибка при обновлении статуса: ' + err.message);
     }
 }
 
@@ -370,23 +363,17 @@ function exportToExcel() {
     URL.revokeObjectURL(url);
 }
 
+// ========== ДЕЛАЕМ ФУНКЦИИ ГЛОБАЛЬНЫМИ ДЛЯ HTML КНОПОК ==========
+window.updateBookingStatus = updateBookingStatus;
+window.applyFilters = applyFilters;
+window.resetFilters = resetFilters;
+window.exportToExcel = exportToExcel;
+window.logout = logout;
+window.loadAdminPanelData = loadAdminPanelData;
+window.loadAllBookings = loadAllBookings;
+
 // ========== ЗАПУСК ==========
-// Двойная страховка для admin-panel.html
-if (window.location.pathname.includes('admin-panel.html')) {
-    // Запускаем сразу
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('🚀 DOM загружен (admin-panel), запускаем initSupabase');
-            initSupabase();
-        });
-    } else {
-        console.log('🚀 DOM уже загружен (admin-panel), запускаем initSupabase');
-        initSupabase();
-    }
-} else {
-    // Для остальных страниц
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log('🚀 DOM загружен, запускаем initSupabase');
-        initSupabase();
-    });
-}
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🚀 DOM загружен, запускаем initSupabase');
+    initSupabase();
+});
