@@ -17,7 +17,7 @@ function logout() {
     window.location.href = 'admin-login.html';
 }
 
-// Проверка авторизации (для всех страниц, кроме страницы входа)
+// Проверка авторизации
 if (!window.location.pathname.includes('admin-login.html')) {
     if (localStorage.getItem('admin_logged_in') !== 'true') {
         window.location.href = 'admin-login.html';
@@ -61,6 +61,8 @@ async function initSupabase() {
 async function loadAdminPanelData() {
     if (!supabaseAdmin) return;
     
+    console.log('🔍 loadAdminPanelData запущена');
+    
     try {
         const { data: bookings, error } = await supabaseAdmin
             .from('bookings')
@@ -76,6 +78,11 @@ async function loadAdminPanelData() {
             .order('created_at', { ascending: false });
         
         if (error) throw error;
+        
+        console.log('📊 Данные загружены, количество:', bookings.length);
+        
+        // Сохраняем в глобальную переменную
+        allBookings = bookings;
         
         const totalBookings = bookings.length;
         const pendingBookings = bookings.filter(b => b.status === 'pending').length;
@@ -102,6 +109,8 @@ async function loadAdminPanelData() {
 
 function renderRecentBookings(bookings) {
     const container = document.getElementById('recentBookingsTable');
+    console.log('🎨 renderRecentBookings, контейнер найден:', !!container);
+    
     if (!container) return;
     
     if (!bookings || bookings.length === 0) {
@@ -148,6 +157,7 @@ function renderRecentBookings(bookings) {
     
     html += `</tbody></table>`;
     container.innerHTML = html;
+    console.log('✅ Таблица отрендерена');
 }
 
 // ========== ДЛЯ СТРАНИЦЫ admin-bookings.html ==========
@@ -191,7 +201,7 @@ function renderAllBookingsTable(bookings) {
         return;
     }
     
-    let html = `<table>
+    let html = `<tr>
         <thead>
             <tr>
                 <th>ID</th>
@@ -336,4 +346,14 @@ function exportToExcel() {
 }
 
 // ========== ЗАПУСК ==========
-document.addEventListener('DOMContentLoaded', initSupabase);
+document.addEventListener('DOMContentLoaded', function() {
+    initSupabase();
+    
+    // Принудительный вызов для админ-панели
+    setTimeout(() => {
+        if (window.location.pathname.includes('admin-panel.html') && supabaseAdmin) {
+            console.log('🔄 Принудительный вызов loadAdminPanelData');
+            loadAdminPanelData();
+        }
+    }, 500);
+});
