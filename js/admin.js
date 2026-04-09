@@ -30,7 +30,10 @@ if (!window.location.pathname.includes('admin-login.html')) {
 
 // ========== ИНИЦИАЛИЗАЦИЯ SUPABASE ==========
 async function initSupabase() {
+    console.log('🔧 initSupabase вызвана');
+    
     if (typeof supabase === 'undefined') {
+        console.log('⏳ Ожидание загрузки Supabase...');
         setTimeout(initSupabase, 500);
         return;
     }
@@ -49,19 +52,27 @@ async function initSupabase() {
     console.log('✅ Supabase админ подключен');
     
     const currentPage = window.location.pathname;
+    console.log('📄 Текущая страница:', currentPage);
     
+    // Загружаем данные в зависимости от страницы
     if (currentPage.includes('admin-panel.html')) {
-        loadAdminPanelData();
+        console.log('➡️ Загружаем admin-panel');
+        await loadAdminPanelData();
     } else if (currentPage.includes('admin-bookings.html')) {
-        loadAllBookings();
+        console.log('➡️ Загружаем admin-bookings');
+        await loadAllBookings();
     }
 }
 
 // ========== ДЛЯ СТРАНИЦЫ admin-panel.html ==========
 async function loadAdminPanelData() {
-    if (!supabaseAdmin) return;
-    
     console.log('🔍 loadAdminPanelData запущена');
+    
+    if (!supabaseAdmin) {
+        console.log('❌ supabaseAdmin не инициализирован, повторяем попытку через 500ms');
+        setTimeout(loadAdminPanelData, 500);
+        return;
+    }
     
     try {
         const { data: bookings, error } = await supabaseAdmin
@@ -79,7 +90,14 @@ async function loadAdminPanelData() {
         
         if (error) throw error;
         
-        console.log('📊 Данные загружены, количество:', bookings.length);
+        console.log('📊 Данные загружены, количество:', bookings ? bookings.length : 0);
+        
+        if (!bookings || bookings.length === 0) {
+            console.log('⚠️ Нет данных в таблице bookings');
+            const container = document.getElementById('recentBookingsTable');
+            if (container) container.innerHTML = '<p style="padding:20px;">Нет заявок в базе данных</p>';
+            return;
+        }
         
         // Сохраняем в глобальную переменную
         allBookings = bookings;
@@ -87,6 +105,8 @@ async function loadAdminPanelData() {
         const totalBookings = bookings.length;
         const pendingBookings = bookings.filter(b => b.status === 'pending').length;
         const confirmedBookings = bookings.filter(b => b.status === 'confirmed').length;
+        
+        console.log('📈 Статистика:', { totalBookings, pendingBookings, confirmedBookings });
         
         const totalEl = document.getElementById('totalBookings');
         const pendingEl = document.getElementById('pendingBookings');
@@ -102,7 +122,7 @@ async function loadAdminPanelData() {
         console.error('❌ Ошибка загрузки:', err);
         const tableContainer = document.getElementById('recentBookingsTable');
         if (tableContainer) {
-            tableContainer.innerHTML = '<p style="padding:20px;">Ошибка загрузки данных</p>';
+            tableContainer.innerHTML = '<p style="padding:20px;">Ошибка загрузки данных: ' + err.message + '</p>';
         }
     }
 }
@@ -111,12 +131,17 @@ function renderRecentBookings(bookings) {
     const container = document.getElementById('recentBookingsTable');
     console.log('🎨 renderRecentBookings, контейнер найден:', !!container);
     
-    if (!container) return;
+    if (!container) {
+        console.error('❌ Контейнер recentBookingsTable не найден!');
+        return;
+    }
     
     if (!bookings || bookings.length === 0) {
         container.innerHTML = '<p style="padding:20px;">Нет заявок</p>';
         return;
     }
+    
+    console.log('📝 Рендерим', bookings.length, 'заявок');
     
     let html = `<table>
         <thead>
@@ -187,7 +212,7 @@ async function loadAllBookings() {
         console.error('❌ Ошибка загрузки:', err);
         const tableContainer = document.getElementById('bookingsTable');
         if (tableContainer) {
-            tableContainer.innerHTML = '<p style="padding:20px;">Ошибка загрузки данных</p>';
+            tableContainer.innerHTML = '<p style="padding:20px;">Ошибка загрузки数据</p>';
         }
     }
 }
@@ -201,7 +226,7 @@ function renderAllBookingsTable(bookings) {
         return;
     }
     
-    let html = `<tr>
+    let html = `<table>
         <thead>
             <tr>
                 <th>ID</th>
@@ -346,14 +371,22 @@ function exportToExcel() {
 }
 
 // ========== ЗАПУСК ==========
-document.addEventListener('DOMContentLoaded', function() {
-    initSupabase();
-    
-    // Принудительный вызов для админ-панели
-    setTimeout(() => {
-        if (window.location.pathname.includes('admin-panel.html') && supabaseAdmin) {
-            console.log('🔄 Принудительный вызов loadAdminPanelData');
-            loadAdminPanelData();
-        }
-    }, 500);
-});
+// Двойная страховка для admin-panel.html
+if (window.location.pathname.includes('admin-panel.html')) {
+    // Запускаем сразу
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 DOM загружен (admin-panel), запускаем initSupabase');
+            initSupabase();
+        });
+    } else {
+        console.log('🚀 DOM уже загружен (admin-panel), запускаем initSupabase');
+        initSupabase();
+    }
+} else {
+    // Для остальных страниц
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('🚀 DOM загружен, запускаем initSupabase');
+        initSupabase();
+    });
+}
