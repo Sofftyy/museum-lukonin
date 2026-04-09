@@ -213,7 +213,7 @@ function renderAllBookingsTable(bookings) {
         return;
     }
     
-    let html = `</table>
+    let html = `<table>
         <thead>
             <tr>
                 <th>ID</th>
@@ -271,9 +271,10 @@ async function updateBookingStatus(bookingId, newStatus) {
     }
     
     try {
+        // Обновляем статус (без updated_at, так как его может не быть в таблице)
         const { error } = await supabaseAdmin
             .from('bookings')
-            .update({ status: newStatus, updated_at: new Date() })
+            .update({ status: newStatus })
             .eq('id', bookingId);
         
         if (error) throw error;
