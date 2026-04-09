@@ -734,6 +734,159 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('🎉 Сайт готов к работе!');
 });
 
+
+// ========== ПОИСК ПО САЙТУ ==========
+// Список страниц для поиска
+const pagesToSearch = [
+    { url: "index.html", title: "Экскурсии", description: "Запись на экскурсии в Мемориальной квартире поэта М.К. Луконина. Календарь, форма бронирования." },
+    { url: "muzey.html", title: "О музее", description: "История Мемориальной квартиры, коллекция, деятельность музея, практическая информация." },
+    { url: "biography.html", title: "Биография", description: "Биография поэта М.К. Луконина: детство, военные годы, творчество, наследие." },
+    { url: "virtual-tour.html", title: "Виртуальная экскурсия", description: "Виртуальная экскурсия по Мемориальной квартире. Экспонаты: подарки друзей, личные вещи, интерьеры." },
+    { url: "svo.html", title: "Для участников СВО", description: "Сервис QR-код для подтверждения статуса участника СВО. Льготы и бесплатное посещение музея." },
+    { url: "pushkin-card.html", title: "Пушкинская карта", description: "Программа Пушкинская карта для молодёжи. Мероприятия музея по Пушкинской карте." }
+];
+
+// Содержимое страниц для поиска
+const pageContent = {
+    "index.html": "Экскурсии Мемориальная квартира Луконин запись календарь бронирование форма заявки Пешеходная экскурсия по мемориальной квартире поэта Михаила Кузьмича Луконина место где сохранилась подлинная атмосфера его жизни и творчества Здесь вы увидите личные вещи библиотеку и подарки друзей ощутите гостеприимство волжского дома поэта Бурка и папаха от Расула Гамзатова Портрет Луконина работы Ильи Глазунова Детские разноцветные валенки от Маргариты Агашиной Портрет Эрнеста Хемингуэя Личная библиотека рукописи и сувениры из разных уголков земли г Волгоград ул Чуйкова 31 кв 47 Запись обязательна по телефону 8442 38-84-42 или через форму ниже Музей сохраняет главное качество гостеприимство",
+    "muzey.html": "О музее Мемориальная квартира поэта Михаила Кузьмича Луконина была открыта 25 октября 1978 года Волгоградский областной краеведческий музей Коллекция музея насчитывает более 2500 экспонатов Личная библиотека поэта рукописи подарки от друзей бурка и папаха от Расула Гамзатова портрет кисти Ильи Глазунова валенки от Маргариты Агашиной портрет Эрнеста Хемингуэя Адрес г Волгоград ул Чуйкова 31 кв 47 Телефон 8442 38-84-42",
+    "biography.html": "Биография Михаил Кузьмич Луконин родился в 1918 году советский поэт военный корреспондент лауреат Государственной премии СССР 1973 Участник Великой Отечественной войны награждён орденами и медалями После войны жил и работал в Волгограде Детство и юность Учился в Сталинградском педагогическом институте в Литературном институте в Москве Военные годы служил военным корреспондентом был ранен Творчество основные темы война труд любовь к Родине сборники стихов Лирика Перед рассветом Дорога в завтра Стихи Память Последние годы и наследие умер в 1976 году похоронен на Мамаевом кургане",
+    "virtual-tour.html": "Виртуальная экскурсия Экспонаты музея-квартиры Портрет Эрнеста Хемингуэя с дарственной надписью Бурка белая подарок от Расула Гамзатова Печатная машинка Consul и проигрыватель Sanyo Портрет Константина Симонова Картина Ф Суханов Буйство весны Картина У Байкала Интерьер квартиры Рабочий кабинет поэта Гостиная Документы фотографии и награды Коллекция веников Портрет поэта кисти Ильи Глазунова Вид на Волгу с балкона",
+    "svo.html": "СВО специальная военная операция QR-код для подтверждения статуса участника СВО Госуслуги Льготы для участников СВО в музее Бесплатное посещение всех экспозиций и выставок Волгоградский областной краеведческий музей Документы удостоверение ветерана боевых действий справка об участии в СВО удостоверение члена семьи погибшего ветерана свидетельство о рождении ребёнка Экскурсионное обслуживание скидки Телефон 8 8442 38-84-39",
+    "pushkin-card.html": "Пушкинская карта ВТБ с 2026 года оператором программы станет ВТБ Для молодёжи от 14 до 22 лет Ежегодно на неё начисляется 5 000 рублей Мероприятия по Пушкинской карте на апрель 2026 Экспозиции Волгоградского краеведческого музея Экскурсия История и традиции Волгоградской области Тематическая экскурсия Золотая кладовая Лекториум Пешеходные экскурсии Тайны Царицынских улиц Посиделки у поэта в мемориальной квартире"
+};
+
+function parseQuery(query) {
+    query = query.trim();
+    if (query.includes(" не ")) {
+        let parts = query.split(" не ");
+        return { type: "not", term1: parts[0].trim(), term2: parts[1].trim() };
+    } else if (query.includes(" или ")) {
+        let parts = query.split(" или ");
+        return { type: "or", term1: parts[0].trim(), term2: parts[1].trim() };
+    } else if (query.includes(" ")) {
+        let terms = query.split(" ").filter(t => t.length > 0);
+        return { type: "and", terms: terms };
+    } else {
+        return { type: "single", term: query };
+    }
+}
+
+function matchesQuery(content, parsedQuery) {
+    if (parsedQuery.type === "single") {
+        return content.toLowerCase().includes(parsedQuery.term.toLowerCase());
+    } else if (parsedQuery.type === "and") {
+        return parsedQuery.terms.every(term => content.toLowerCase().includes(term.toLowerCase()));
+    } else if (parsedQuery.type === "or") {
+        return content.toLowerCase().includes(parsedQuery.term1.toLowerCase()) || 
+               content.toLowerCase().includes(parsedQuery.term2.toLowerCase());
+    } else if (parsedQuery.type === "not") {
+        return content.toLowerCase().includes(parsedQuery.term1.toLowerCase()) && 
+               !content.toLowerCase().includes(parsedQuery.term2.toLowerCase());
+    }
+    return false;
+}
+
+function highlightText(text, query) {
+    if (!query) return text;
+    let words = query.split(" ").filter(w => w.length > 2);
+    let regex = new RegExp(`(${words.join("|")})`, "gi");
+    return text.replace(regex, '<mark class="search-highlight">$1</mark>');
+}
+
+function performSearch() {
+    const searchInput = document.getElementById('searchInput');
+    if (!searchInput) return;
+    
+    const query = searchInput.value.trim();
+    
+    if (!query) {
+        const resultsCount = document.getElementById('resultsCount');
+        const resultsList = document.getElementById('resultsList');
+        if (resultsCount) resultsCount.innerHTML = '';
+        if (resultsList) resultsList.innerHTML = '<p>Введите поисковый запрос.</p>';
+        return;
+    }
+
+    const parsedQuery = parseQuery(query);
+    const results = [];
+
+    for (const page of pagesToSearch) {
+        const content = pageContent[page.url] || "";
+        if (matchesQuery(content, parsedQuery)) {
+            let snippet = "";
+            let searchTerm = "";
+            if (parsedQuery.type === "single") searchTerm = parsedQuery.term;
+            else if (parsedQuery.type === "and") searchTerm = parsedQuery.terms[0];
+            else if (parsedQuery.type === "or") searchTerm = parsedQuery.term1;
+            else if (parsedQuery.type === "not") searchTerm = parsedQuery.term1;
+            
+            if (searchTerm && content.toLowerCase().includes(searchTerm.toLowerCase())) {
+                const index = content.toLowerCase().indexOf(searchTerm.toLowerCase());
+                const start = Math.max(0, index - 100);
+                const end = Math.min(content.length, index + searchTerm.length + 100);
+                snippet = content.substring(start, end);
+                snippet = highlightText(snippet, searchTerm);
+                if (start > 0) snippet = "..." + snippet;
+                if (end < content.length) snippet = snippet + "...";
+            } else {
+                snippet = content.substring(0, 200) + "...";
+            }
+            
+            results.push({
+                url: page.url,
+                title: page.title,
+                description: page.description,
+                snippet: snippet
+            });
+        }
+    }
+
+    const resultsCountDiv = document.getElementById('resultsCount');
+    const resultsListDiv = document.getElementById('resultsList');
+    
+    if (results.length === 0) {
+        if (resultsCountDiv) resultsCountDiv.innerHTML = `<p>По вашему запросу «${query}» ничего не найдено.</p>`;
+        if (resultsListDiv) resultsListDiv.innerHTML = '';
+    } else {
+        if (resultsCountDiv) resultsCountDiv.innerHTML = `<p>Найдено ${results.length} результат(ов) по запросу «${query}».</p>`;
+        if (resultsListDiv) resultsListDiv.innerHTML = results.map(result => `
+            <div class="search-result-item">
+                <a href="${result.url}">${result.title}</a>
+                <div class="search-result-url">${result.url}</div>
+                <div class="search-result-snippet">${result.snippet}</div>
+            </div>
+        `).join('');
+    }
+}
+
+// Инициализация поиска на странице search.html
+function initSearchPage() {
+    const searchButton = document.getElementById('searchButton');
+    const searchInput = document.getElementById('searchInput');
+    
+    if (searchButton) {
+        searchButton.addEventListener('click', performSearch);
+    }
+    if (searchInput) {
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') performSearch();
+        });
+    }
+    
+    const urlParams = new URLSearchParams(window.location.search);
+    const queryParam = urlParams.get('q');
+    if (queryParam && searchInput) {
+        searchInput.value = queryParam;
+        performSearch();
+    }
+}
+
+// Запускаем поиск, если мы на странице search.html
+if (window.location.pathname.includes('search.html')) {
+    document.addEventListener('DOMContentLoaded', initSearchPage);
+}
+
 // ========== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ==========
 function showStats() {
     const bookings = JSON.parse(localStorage.getItem('bookings') || '[]');
