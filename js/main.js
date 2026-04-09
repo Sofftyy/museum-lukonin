@@ -64,7 +64,7 @@ async function sendEmailNotification(bookingData) {
     try {
         const result = await emailjs.send(
             'service_2gyjty2',           // Service ID
-            'template_8ggpirs',          // Template ID (правильный!)
+            'template_8ggpirs',          // Template ID
             {
                 name: name,
                 phone: phone,
@@ -594,6 +594,96 @@ function loadGrayscaleMode() {
     }
 }
 
+// ========== БУРГЕР-МЕНЮ ДЛЯ МОБИЛЬНЫХ ==========
+function initMobileMenu() {
+    if (window.innerWidth > 768) return;
+    
+    if (document.querySelector('.mobile-nav-bar')) return;
+    
+    // Создаём полосу с бургер-меню
+    const navBar = document.createElement('div');
+    navBar.className = 'mobile-nav-bar';
+    navBar.innerHTML = `
+        <span class="menu-text">Меню</span>
+        <div class="burger-icon">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    `;
+    
+    // Создаём выезжающее меню
+    const mobileMenu = document.createElement('div');
+    mobileMenu.className = 'mobile-menu';
+    
+    // Копируем ссылки из оригинальной навигации
+    const originalNav = document.querySelector('.nav');
+    const navList = originalNav ? originalNav.querySelector('.nav-list') : null;
+    
+    if (navList) {
+        const newNavList = document.createElement('ul');
+        newNavList.className = 'mobile-nav-list';
+        
+        const links = navList.querySelectorAll('li');
+        links.forEach(link => {
+            const newLink = link.cloneNode(true);
+            newNavList.appendChild(newLink);
+        });
+        
+        mobileMenu.appendChild(newNavList);
+    }
+    
+    // Вставляем элементы на страницу
+    const header = document.querySelector('.header');
+    header.insertAdjacentElement('afterend', navBar);
+    document.body.appendChild(mobileMenu);
+    
+    // Открытие/закрытие меню
+    const burgerIcon = navBar.querySelector('.burger-icon');
+    
+    function toggleMenu() {
+        mobileMenu.classList.toggle('open');
+        document.body.classList.toggle('menu-open');
+    }
+    
+    navBar.addEventListener('click', toggleMenu);
+    
+    // Закрываем меню при клике на ссылку
+    const menuLinks = mobileMenu.querySelectorAll('a');
+    menuLinks.forEach(link => {
+        link.addEventListener('click', function() {
+            mobileMenu.classList.remove('open');
+            document.body.classList.remove('menu-open');
+        });
+    });
+    
+    // Закрываем меню при клике на затемнённую область
+    document.body.addEventListener('click', function(e) {
+        if (mobileMenu.classList.contains('open') && 
+            !mobileMenu.contains(e.target) && 
+            !navBar.contains(e.target)) {
+            mobileMenu.classList.remove('open');
+            document.body.classList.remove('menu-open');
+        }
+    });
+}
+
+// При изменении размера окна
+window.addEventListener('resize', function() {
+    const mobileNavBar = document.querySelector('.mobile-nav-bar');
+    const mobileMenu = document.querySelector('.mobile-menu');
+    
+    if (window.innerWidth > 768) {
+        if (mobileNavBar) mobileNavBar.remove();
+        if (mobileMenu) mobileMenu.remove();
+        document.body.classList.remove('menu-open');
+    } else {
+        if (!document.querySelector('.mobile-nav-bar')) {
+            initMobileMenu();
+        }
+    }
+});
+
 // ========== ИНИЦИАЛИЗАЦИЯ ==========
 document.addEventListener('DOMContentLoaded', () => {
     initLogoLink();
@@ -634,6 +724,9 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Загружаем сохранённый чёрно-белый режим
     loadGrayscaleMode();
+    
+    // Инициализируем бургер-меню для мобильных
+    initMobileMenu();
     
     initSupabase();
     switchView('calendar');
