@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Управление расписанием | Админ-панель</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/admin.css">
+    <style>
+        .form-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 0;
+        }
+        .form-group label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: block;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-family: inherit;
+        }
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #6F6F6F;
+        }
+        .btn-submit {
+            background: #28a745;
+            width: auto;
+            padding: 10px 24px;
+        }
+        .btn-submit:hover {
+            background: #218838;
+        }
+        .btn-danger {
+            background: #dc3545;
+        }
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        .schedule-item {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .schedule-info {
+            flex: 1;
+        }
+        .schedule-actions {
+            display: flex;
+            gap: 8px;
+        }
+        .btn-icon {
+            padding: 6px 12px;
+            font-size: 12px;
+            width: auto;
+        }
+        .success-msg {
+            background: #d4edda;
+            color: #155724;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        .error-msg {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        .json-hint {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+        .batch-area {
+            margin-top: 15px;
+        }
+        .batch-area textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 12px;
+            resize: vertical;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-header">
+        <div class="logo">
+            <h1>👑 Админ-панель</h1>
+            <span>Мемориальная квартира М.К. Луконина</span>
+        </div>
+        <div class="admin-info">
+            <span id="adminName">Администратор</span>
+            <a href="admin-panel.html">Главная</a>
+            <a href="admin-bookings.html">📋 Все заявки</a>
+            <a href="admin-schedules.html" class="nav-link active">📅 Расписание</a>
+            <a href="javascript:void(0)" onclick="logout()" class="logout-btn">Выход</a>
+        </div>
+    </div>
+    
+    <div class="admin-nav">
+        <a href="admin-panel.html" class="nav-link">📊 Главная</a>
+        <a href="admin-bookings.html" class="nav-link">📋 Все заявки</a>
+        <a href="admin-schedules.html" class="nav-link active">📅 Расписание</a>
+    </div>
+    
+    <div class="admin-content">
+        <div id="successMsg" class="success-msg">✅ Успешно добавлено!</div>
+        <div id="errorMsg" class="error-msg">❌ Ошибка</div>
+        
+        <!-- Форма добавления одной экскурсии -->
+        <div class="form-card">
+            <h3>➕ Добавить экскурсию вручную</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Экскурсия *</label>
+                    <select id="excursionId">
+                        <option value="">-- Выберите экскурсию --</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Дата *</label>
+                    <input type="date" id="excursionDate">
+                </div>
+                <div class="form-group">
+                    <label>Время *</label>
+                    <input type="time" id="startTime" step="60">
+                </div>
+                <div class="form-group">
+                    <label>Макс. мест</label>
+                    <input type="number" id="availablePlaces" value="15" min="1" max="50">
+                </div>
+            </div>
+            <button class="btn-submit" onclick="addSingleSchedule()">➕ Добавить</button>
+        </div>
+        
+        <!-- Массовое добавление через JSON -->
+        <div class="form-card">
+            <h3>📦 Массовое добавление (JSON)</h3>
+            <p class="json-hint">Формат: [{"excursion_id":5,"excursion_date":"2026-05-08","start_time":"15:00","available_places":15}]</p>
+            <div class="batch-area">
+                <textarea id="batchJson" rows="5" placeholder='[
+  {"excursion_id":5,"excursion_date":"2026-05-08","start_time":"15:00","available_places":15},
+  {"excursion_id":6,"excursion_date":"2026-05-14","start_time":"15:00","available_places":12}
+]'></textarea>
+            </div>
+            <button class="btn-submit" onclick="addBatchSchedules()" style="margin-top:15px;">📦 Добавить массово</button>
+        </div>
+        
+        <!-- Список существующих расписаний -->
+        <div class="form-card">
+            <h3>📅 Текущее расписание</h3>
+            <div id="schedulesList" class="loading">Загрузка...</div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/admin.js"></script>
+    <script>
+        // Дополнительные функции для страницы расписания
+        let supabaseSchedules = null;
+        
+        async function initSchedulesPage() {
+            if (typeof supabase === 'undefined') {
+                setTimeout(initSchedulesPage, 500);
+                return;
+            }
+            
+            if (typeof SUPABASE_CONFIG === 'undefined' || !SUPABASE_CONFIG.url) {
+                document.getElementById('schedulesList').innerHTML = '<p>Ошибка подключения</p>';
+                return;
+            }
+            
+            const { createClient } = supabase;
+            supabaseSchedules = createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
+            
+            await loadExcursions();
+            await loadSchedules();
+        }
+        
+        async function loadExcursions() {
+            const { data, error } = await supabaseSchedules
+                .from('excursions')
+                .select('id, name')
+                .eq('is_active', true)
+                .order('name');
+            
+            if (error) {
+                console.error('Ошибка загрузки экскурсий:', error);
+                return;
+            }
+            
+            const select = document.getElementById('excursionId');
+            select.innerHTML = '<option value="">-- Выберите экскурсию --</option>';
+            data.forEach(exc => {
+                select.innerHTML += `<option value="${exc.id}">${exc.name}</option>`;
+            });
+        }
+        
+        async function loadSchedules() {
+            const { data, error } = await supabaseSchedules
+                .from('excursion_schedules')
+                .select(`
+                    id,
+                    excursion_date,
+                    start_time,
+                    available_places,
+                    is_cancelled,
+                    excursions (id, name)
+                `)
+                .gte('excursion_date', new Date().toISOString().split('T')[0])
+                .order('excursion_date')
+                .order('start_time');
+            
+            if (error) {
+                document.getElementById('schedulesList').innerHTML = '<p>Ошибка загрузки</p>';
+                return;
+            }
+            
+            if (!data || data.length === 0) {
+                document.getElementById('schedulesList').innerHTML = '<p>Нет активных расписаний</p>';
+                return;
+            }
+            
+            let html = '';
+            data.forEach(schedule => {
+                html += `
+                    <div class="schedule-item">
+                        <div class="schedule-info">
+                            <strong>${schedule.excursions?.name || '-'}</strong><br>
+                            📅 ${formatDateDisplay(schedule.excursion_date)} в ${schedule.start_time.substring(0,5)}<br>
+                            🎟️ Свободно: ${schedule.available_places} мест
+                            ${schedule.is_cancelled ? '<span style="color:red;"> (ОТМЕНЕНА)</span>' : ''}
+                        </div>
+                        <div class="schedule-actions">
+                            ${!schedule.is_cancelled ? `<button class="btn-small btn-cancel btn-icon" onclick="cancelSchedule(${schedule.id})">❌ Отменить</button>` : ''}
+                            <button class="btn-small btn-icon" style="background:#6c757d; color:white;" onclick="deleteSchedule(${schedule.id})">🗑️ Удалить</button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            document.getElementById('schedulesList').innerHTML = html;
+        }
+        
+        async function addSingleSchedule() {
+            const excursionId = document.getElementById('excursionId').value;
+            const excursionDate = document.getElementById('excursionDate').value;
+            const startTime = document.getElementById('startTime').value;
+            const availablePlaces = document.getElementById('availablePlaces').value;
+            
+            if (!excursionId || !excursionDate || !startTime) {
+                showError('Заполните все обязательные поля');
+                return;
+            }
+            
+            const { error } = await supabaseSchedules
+                .from('excursion_schedules')
+                .insert({
+                    excursion_id: parseInt(excursionId),
+                    excursion_date: excursionDate,
+                    start_time: startTime,
+                    available_places: parseInt(availablePlaces),
+                    is_cancelled: false
+                });
+            
+            if (error) {
+                showError('Ошибка: ' + error.message);
+                return;
+            }
+            
+            showSuccess('Экскурсия добавлена!');
+            clearForm();
+            await loadSchedules();
+        }
+        
+        async function addBatchSchedules() {
+            const jsonText = document.getElementById('batchJson').value;
+            
+            try {
+                const schedules = JSON.parse(jsonText);
+                
+                if (!Array.isArray(schedules)) {
+                    throw new Error('Должен быть массив');
+                }
+                
+                let successCount = 0;
+                let errorCount = 0;
+                
+                for (const schedule of schedules) {
+                    const { error } = await supabaseSchedules
+                        .from('excursion_schedules')
+                        .insert({
+                            excursion_id: schedule.excursion_id,
+                            excursion_date: schedule.excursion_date,
+                            start_time: schedule.start_time,
+                            available_places: schedule.available_places || 15,
+                            is_cancelled: false
+                        });
+                    
+                    if (error) errorCount++;
+                    else successCount++;
+                }
+                
+                showSuccess(`Добавлено: ${successCount}, Ошибок: ${errorCount}`);
+                await loadSchedules();
+                
+            } catch (e) {
+                showError('Ошибка JSON: ' + e.message);
+            }
+        }
+        
+        async function cancelSchedule(scheduleId) {
+            if (!confirm('Отменить эту экскурсию? Она не будет отображаться в календаре')) return;
+            
+            const { error } = await supabaseSchedules
+                .from('excursion_schedules')
+                .update({ is_cancelled: true })
+                .eq('id', scheduleId);
+            
+            if (error) {
+                showError('Ошибка');
+                return;
+            }
+            
+            showSuccess('Экскурсия отменена');
+            await loadSchedules();
+        }
+        
+        async function deleteSchedule(scheduleId) {
+            if (!confirm('Удалить эту запись НАВСЕГДА?')) return;
+            
+            const { error } = await supabaseSchedules
+                .from('excursion_schedules')
+                .delete()
+                .eq('id', scheduleId);
+            
+            if (error) {
+                showError('Ошибка: ' + error.message);
+                return;
+            }
+            
+            showSuccess('Удалено');
+            await loadSchedules();
+        }
+        
+        function clearForm() {
+            document.getElementById('excursionDate').value = '';
+            document.getElementById('startTime').value = '';
+            document.getElementById('availablePlaces').value = '15';
+        }
+        
+        function showSuccess(msg) {
+            const el = document.getElementById('successMsg');
+            el.textContent = '✅ ' + msg;
+            el.style.display = 'block';
+            setTimeout(() => el.style.display = 'none', 3000);
+        }
+        
+        function showError(msg) {
+            const el = document.getElementById('errorMsg');
+            el.textContent = '❌ ' + msg;
+            el.style.display = 'block';
+            setTimeout(() => el.style.display = 'none', 3000);
+        }
+        
+        function formatDateDisplay(dateStr) {
+            if (!dateStr) return '-';
+            const [year, month, day] = dateStr.split('-');
+            return `${day}.${month}.${year}`;
+        }
+        
+        // Добавляем функции в глобальный объект
+        window.addSingleSchedule = addSingleSchedule;
+        window.addBatchSchedules = addBatchSchedules;
+        window.cancelSchedule = cancelSchedule;
+        window.deleteSchedule = deleteSchedule;
+        
+        // Запуск
+        document.addEventListener('DOMContentLoaded', initSchedulesPage);
+    </script>
+</body>
+</html>
