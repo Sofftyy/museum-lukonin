@@ -68,7 +68,7 @@ async function sendEmailNotification(bookingData) {
             {
                 name: name,
                 phone: phone,
-                user_email: email,
+                user_email: email,З
                 excursion: excursionName,
                 date: dateFormatted,
                 time: time,
@@ -432,7 +432,8 @@ async function saveBookingToSupabase(bookingData) {
             }
         }
         
-        const bookingCode = Math.random().toString(36).substring(2, 10).toUpperCase();
+        // старая версиә const bookingCode = Math.random().toString(36).substring(2, 10).toUpperCase();
+        const bookingCode = Date.now().toString(36).toUpperCase() + Math.random().toString(36).substring(2, 6).toUpperCase();
         
         const { data: booking, error: bookingError } = await supabaseClient
             .from('bookings')
