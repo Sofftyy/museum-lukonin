@@ -68,7 +68,7 @@ async function sendEmailNotification(bookingData) {
             {
                 name: name,
                 phone: phone,
-                user_email: email,З
+                user_email: email,
                 excursion: excursionName,
                 date: dateFormatted,
                 time: time,
