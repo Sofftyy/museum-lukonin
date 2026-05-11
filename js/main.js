@@ -432,8 +432,8 @@ async function saveBookingToSupabase(bookingData) {
             }
         }
         
-        // старая версиә const bookingCode = Math.random().toString(36).substring(2, 10).toUpperCase();
-        const bookingCode = Date.now().toString(36).toUpperCase() + Math.random().toString(36).substring(2, 6).toUpperCase();
+        const bookingCode = Math.random().toString(36).substring(2, 10).toUpperCase();
+        // ошибка тут const bookingCode = Date.now().toString(36).toUpperCase() + Math.random().toString(36).substring(2, 6).toUpperCase();
         
         const { data: booking, error: bookingError } = await supabaseClient
             .from('bookings')
