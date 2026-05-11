@@ -275,7 +275,8 @@ async function updateBookingStatus(bookingId, newStatus) {
         const { error } = await supabaseAdmin
             .from('bookings')
             .update({ status: newStatus })
-            .eq('id', bookingId);
+            .eq('id', bookingId)
+            .select();
         
         if (error) throw error;
         
